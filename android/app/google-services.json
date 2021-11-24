@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "992975996403",
+    "project_id": "parking-graduation-app-1",
+    "storage_bucket": "parking-graduation-app-1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992975996403:android:1b6db4f00292dcea993e86",
+        "android_client_info": {
+          "package_name": "com.faculty.parking_graduation_app_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "992975996403-4kp2iht1m5g1d57rcrek47l9uj18kghm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeaXW0qozUBiDJyXJ2ijwK4SNSiKzfAjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "992975996403-4kp2iht1m5g1d57rcrek47l9uj18kghm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
