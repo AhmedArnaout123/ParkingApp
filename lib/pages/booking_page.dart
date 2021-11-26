@@ -18,8 +18,8 @@ class _BookingPageState extends State<BookingPage> {
     {'duration': '6 hours', 'price': 3000}
   ];
 
-  var payOnSite = false;
-  Map<String, dynamic>? selectedReservation;
+  bool payFromWallet = true;
+  Map<String, dynamic> selectedReservation = {};
 
   @override
   void initState() {
@@ -34,6 +34,8 @@ class _BookingPageState extends State<BookingPage> {
         children: [
           const _Header(),
           const SizedBox(height: 30),
+          _TimeLine(selectedReservation['duration']),
+          const SizedBox(height: 10),
           SizedBox(
             height: 100,
             child: ListView.builder(
@@ -55,7 +57,58 @@ class _BookingPageState extends State<BookingPage> {
                 );
               },
             ),
-          )
+          ),
+          const SizedBox(height: 40),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Select Payment',
+              style: TextStyle(
+                color: Color(0xFF909294),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        payFromWallet = true;
+                      });
+                    },
+                    child: _PaymentCard(
+                      icon: Icons.wallet_membership,
+                      text: 'Wallet',
+                      isSelected: payFromWallet,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        payFromWallet = false;
+                      });
+                    },
+                    child: _PaymentCard(
+                      icon: Icons.credit_card,
+                      isSelected: !payFromWallet,
+                      text: 'Credit Card',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          _ConfirmButton(onPressed: () {}, showLoading: false),
+          const SizedBox(height: 12)
         ],
       ),
     );
@@ -125,6 +178,9 @@ class ResravationCard extends StatelessWidget {
     return SizedBox(
       width: 120,
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Container(
           decoration: isSelected
               ? BoxDecoration(
@@ -165,6 +221,145 @@ class ResravationCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeLine extends StatelessWidget {
+  const _TimeLine(this.reservationDuration, {Key? key}) : super(key: key);
+
+  final String reservationDuration;
+
+  String getFinishTime() {
+    DateTime now = DateTime.now();
+    Duration duration;
+    if (reservationDuration == '30 min') {
+      duration = Duration(minutes: 30);
+    } else {
+      duration = Duration(hours: int.parse(reservationDuration[0]));
+    }
+    DateTime finishTime = now.add(duration);
+    int finishHour = finishTime.hour;
+    String dayTime = 'AM';
+    if (finishHour > 12) {
+      dayTime = 'PM';
+      finishHour -= 12;
+    }
+    return '$finishHour:${finishTime.minute} $dayTime';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Select hours',
+            style: TextStyle(
+              color: Color(0xFF909294),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.timelapse,
+                color: Color(0xFF398AE5),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Now  -  ${getFinishTime()}',
+                style: const TextStyle(
+                  color: Color(0xFF398AE5),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PaymentCard extends StatelessWidget {
+  const _PaymentCard(
+      {Key? key,
+      this.isSelected = false,
+      this.icon = Icons.wallet_membership,
+      this.text = 'Wallet'})
+      : super(key: key);
+
+  final bool isSelected;
+  final IconData icon;
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFF0F4F7),
+        gradient: isSelected
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF73AEF5),
+                  Color(0xFF61A4F1),
+                  Color(0xFF478DE0),
+                  Color(0xFF398AE5),
+                ],
+                stops: [0.1, 0.4, 0.7, 0.9],
+              )
+            : null,
+      ),
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Colors.white : Colors.black,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _ConfirmButton extends StatelessWidget {
+  const _ConfirmButton({Key? key, this.showLoading = false, this.onPressed})
+      : super(key: key);
+
+  final bool showLoading;
+  final void Function()? onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: SizedBox(
+        height: 50,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: onPressed,
+          child: const Text(
+            'OK',
+            style: TextStyle(fontSize: 18),
           ),
         ),
       ),

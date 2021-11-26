@@ -25,6 +25,7 @@ class ParkingApp extends StatelessWidget {
       initialData: _locatorService.initialPosition,
       create: (context) => _locatorService.getLocation(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Parking App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
