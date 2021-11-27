@@ -69,7 +69,7 @@ class _AppInitializerState extends State<AppInitializer> {
   @override
   Widget build(BuildContext context) {
     if (initializerSucceeded) {
-      return BookingPage();
+      return HomePage();
       // if (token != null)
       //   return HomePage();
       // else

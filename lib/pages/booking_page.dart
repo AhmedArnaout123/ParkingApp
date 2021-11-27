@@ -352,13 +352,14 @@ class _ConfirmButton extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.8,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
+            primary: const Color(0xFF61A4F1),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
           ),
           onPressed: onPressed,
           child: const Text(
-            'OK',
+            'Book Now',
             style: TextStyle(fontSize: 18),
           ),
         ),
