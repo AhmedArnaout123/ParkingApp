@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
+import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
 import 'package:parking_graduation_app_1/pages/booking_page.dart';
 import 'package:parking_graduation_app_1/pages/home_page.dart';
 import 'package:parking_graduation_app_1/pages/login_page.dart';
 import 'package:parking_graduation_app_1/pages/map_page.dart';
-import 'package:parking_graduation_app_1/services/geo_locator_service.dart';
-import 'package:parking_graduation_app_1/services/storage_service.dart';
+import 'package:parking_graduation_app_1/core/services/geo_locator_service.dart';
+import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -69,7 +71,7 @@ class _AppInitializerState extends State<AppInitializer> {
   @override
   Widget build(BuildContext context) {
     if (initializerSucceeded) {
-      return HomePage();
+      return AddNewLocation();
       // if (token != null)
       //   return HomePage();
       // else
