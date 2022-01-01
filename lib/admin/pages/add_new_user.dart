@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/widgets/app_drawer.dart';
+import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
+import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 
 class AddNewUser extends StatefulWidget {
   const AddNewUser({Key? key}) : super(key: key);
@@ -12,7 +13,12 @@ class AddNewUser extends StatefulWidget {
 class _AddNewUserState extends State<AddNewUser> {
   bool isLoading = false;
 
-  Map<String, String?> form = {"name": "", "password": "", "role": ""};
+  Map<String, String?> form = {
+    "name": "",
+    "password": "",
+    "role": "",
+    "phoneNumber": "",
+  };
 
   var usersCollection = FirebaseFirestore.instance.collection('users');
 
@@ -25,11 +31,9 @@ class _AddNewUserState extends State<AddNewUser> {
   Future<void> addUser() {
     changeLoadingState();
     return usersCollection.add(form).then((value) {
+      UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
       changeLoadingState();
       print('success');
-    }).catchError((e) {
-      if (isLoading) changeLoadingState();
-      print(e);
     });
   }
 
@@ -40,22 +44,22 @@ class _AddNewUserState extends State<AddNewUser> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: Text("مستخدم جديد"),
+            title: const Text("مستخدم جديد"),
           ),
-          drawer: AppDrawer(),
+          drawer: const AdminDrawer(),
           body: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 25),
+            padding: const EdgeInsets.symmetric(horizontal: 25),
             children: [
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               TextFormField(
-                decoration: InputDecoration(hintText: 'الاسم'),
+                decoration: const InputDecoration(hintText: 'الاسم'),
                 onChanged: (value) {
                   form['name'] = value;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'كلمة السر',
                 ),
                 obscureText: true,
@@ -63,16 +67,16 @@ class _AddNewUserState extends State<AddNewUser> {
                   form['password'] = value;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
-                decoration: InputDecoration(hintText: 'رقم الهاتف'),
+                decoration: const InputDecoration(hintText: 'رقم الهاتف'),
                 onChanged: (value) {
                   form['phoneNumber'] = value;
                 },
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               DropdownButtonFormField<String>(
-                hint: Text("النوع"),
+                hint: const Text("النوع"),
                 onChanged: (value) {
                   form['role'] = value;
                 },
@@ -91,7 +95,7 @@ class _AddNewUserState extends State<AddNewUser> {
                   ),
                 ],
               ),
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               _AddButton(onPressed: () => addUser(), showLoading: isLoading)
             ],
           ),
@@ -117,10 +121,19 @@ class _AddButton extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
-      child: const Text(
-        'إضافة',
-        style: TextStyle(fontSize: 18),
-      ),
+      child: showLoading
+          ? const Center(
+              child: SizedBox(
+              height: 25,
+              width: 25,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ))
+          : const Text(
+              'إضافة',
+              style: TextStyle(fontSize: 18),
+            ),
     );
   }
 }

@@ -7,9 +7,9 @@ class Reservation {
 
   double? time;
 
-  DateTime? startDate;
+  String? startDate;
 
-  DateTime? endDate;
+  String? endDate;
 
   double? cost;
 

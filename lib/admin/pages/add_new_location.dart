@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/widgets/app_drawer.dart';
+import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
+import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/user.dart';
 
 class AddNewLocation extends StatefulWidget {
@@ -36,10 +37,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
     changeLoadingState();
     return locationsCollection.add(form).then((value) {
       changeLoadingState();
-      print('success');
-    }).catchError((e) {
-      if (isLoading) changeLoadingState();
-      print(e);
+      UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
     });
   }
 
@@ -58,7 +56,6 @@ class _AddNewLocationState extends State<AddNewLocation> {
         workers.add(User.fromMap(data));
       }
       setState(() {});
-      print(workers);
     });
   }
 
@@ -69,42 +66,42 @@ class _AddNewLocationState extends State<AddNewLocation> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
             appBar: AppBar(
-              title: Text("موقع جديد"),
+              title: const Text("موقع جديد"),
             ),
-            drawer: AppDrawer(),
+            drawer: const AdminDrawer(),
             body: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               children: [
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 TextFormField(
-                  decoration: InputDecoration(hintText: 'اسم الموقع'),
+                  decoration: const InputDecoration(hintText: 'اسم الموقع'),
                   onChanged: (value) {
                     form['name'] = value;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'lat',
                   ),
                   onChanged: (value) {
-                    form['lat'] = value;
+                    form['lat'] = double.parse(value);
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'long',
                   ),
                   onChanged: (value) {
                     form['long'] = double.parse(value);
                   },
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 DropdownButtonFormField<String>(
-                  hint: Text("العامل المسؤول"),
+                  hint: const Text("العامل المسؤول"),
                   onChanged: (value) {
-                    form['workerId'] = double.parse(value ?? "0.0");
+                    form['workerId'] = value;
                   },
                   items: [
                     for (var worker in workers)
@@ -112,7 +109,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
                           child: Text(worker.name ?? ''), value: worker.id)
                   ],
                 ),
-                SizedBox(height: 60),
+                const SizedBox(height: 60),
                 _AddButton(
                   onPressed: addLocation,
                   showLoading: isLoading,
@@ -140,10 +137,19 @@ class _AddButton extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
-      child: const Text(
-        'إضافة',
-        style: TextStyle(fontSize: 18),
-      ),
+      child: showLoading
+          ? const Center(
+              child: SizedBox(
+              height: 25,
+              width: 25,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ))
+          : const Text(
+              'إضافة',
+              style: TextStyle(fontSize: 18),
+            ),
     );
   }
 }
