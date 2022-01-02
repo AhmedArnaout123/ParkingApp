@@ -9,6 +9,8 @@ class User {
 
   double? balance;
 
+  String? userName;
+
   static User fromMap(Map<String, dynamic> map) {
     var user = User();
 
@@ -17,7 +19,7 @@ class User {
     user.role = map['role'];
     user.name = map['name'];
     user.balance = map['balance'] + 0.0;
-
+    user.userName = map['userName'];
     return user;
   }
 
@@ -29,7 +31,7 @@ class User {
     map['role'] = role;
     map['name'] = name;
     map['balance'] = name;
-
+    map['userName'] = userName;
     return map;
   }
 }

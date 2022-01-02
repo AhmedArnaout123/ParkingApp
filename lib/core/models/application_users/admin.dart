@@ -7,6 +7,8 @@ class Admin {
 
   String? name;
 
+  String? userName;
+
   static Admin fromMap(Map<String, dynamic> map) {
     var admin = Admin();
 
@@ -14,7 +16,7 @@ class Admin {
     admin.phoneNumber = map['phoneNumber'];
     admin.role = map['role'];
     admin.name = map['name'];
-
+    admin.userName = map['userName'];
     return admin;
   }
 }

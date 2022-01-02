@@ -7,6 +7,8 @@ class Worker {
 
   String? name;
 
+  String? userName;
+
   static Worker fromMap(Map<String, dynamic> map) {
     var worker = Worker();
 
@@ -14,6 +16,7 @@ class Worker {
     worker.phoneNumber = map['phoneNumber'];
     worker.role = map['role'];
     worker.name = map['name'];
+    worker.userName = map['userName'];
 
     return worker;
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
+import 'package:parking_graduation_app_1/worker/pages/view_worker_payments.dart';
 
 class WorkerDrawer extends StatelessWidget {
   const WorkerDrawer({Key? key}) : super(key: key);
@@ -29,6 +30,22 @@ class WorkerDrawer extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                         builder: (context) => const ViewWorkerLocations()),
+                  ),
+                  icon: const Icon(Icons.place, color: Colors.black),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  label: const Text(
+                    'الدفعات',
+                    style: TextStyle(fontSize: 18, color: Colors.black),
+                  ),
+                  onPressed: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: (context) => const ViewWorkerPayments()),
                   ),
                   icon: const Icon(Icons.place, color: Colors.black),
                 ),

@@ -128,7 +128,7 @@ class _AddReservationState extends State<AddReservation> {
                       items: [
                         for (var user in users)
                           DropdownMenuItem(
-                            child: Text('${user.name} - ${user.phoneNumber}'),
+                            child: Text('${user.name} - ${user.userName}'),
                             value: user,
                           ),
                       ],
