@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
+import 'package:parking_graduation_app_1/users/booking_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -106,6 +107,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => BookingPage()),
+                            );
                             // locations = FirebaseFirestore.instance
                             //     .collection('locations');
                             // locations?.get().then((value) {
@@ -121,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                             // });
                           },
                           child: const Text(
-                            'Select',
+                            'اختيار',
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
