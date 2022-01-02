@@ -1,39 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
-import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/application_users/worker.dart';
+import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
 
-class AddNewLocation extends StatefulWidget {
-  const AddNewLocation({Key? key}) : super(key: key);
+class UpdateLocation extends StatefulWidget {
+  const UpdateLocation(this.location, {Key? key}) : super(key: key);
 
+  final Location location;
   @override
-  _AddNewLocationState createState() => _AddNewLocationState();
+  _UpdateLocationState createState() => _UpdateLocationState();
 }
 
-class _AddNewLocationState extends State<AddNewLocation> {
+class _UpdateLocationState extends State<UpdateLocation> {
   bool isLoading = false;
-
-  Map<String, dynamic> form = {
-    'name': '',
-    'lat': 0.0,
-    'long': 0.0,
-    'state': ConstantsHelper.locationStates[0],
-    'workerId': '',
-    'workerFullName': ''
-  };
+  bool updateButtonisEnabled = false;
 
   List<Worker> workers = [];
 
-  var locationsApiService = LocationsApiService();
-  var applicationUsersApiService = ApplicationUsersApiService();
+  Map<String, dynamic> form = {};
 
   @override
   void initState() {
     super.initState();
-
+    form = {
+      'name': widget.location.name ?? '',
+      'lat': widget.location.lat ?? 0.0,
+      'long': widget.location.long ?? 0.0,
+      'state': widget.location.state,
+      'workerId': widget.location.workerId,
+      'workerFullName': widget.location.workerFullName
+    };
     getWorkers();
   }
 
@@ -44,7 +43,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("موقع جديد"),
+            title: Text(widget.location.name ?? ""),
           ),
           drawer: const AdminDrawer(),
           body: ListView(
@@ -55,7 +54,9 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 decoration: const InputDecoration(hintText: 'اسم الموقع'),
                 onChanged: (value) {
                   form['name'] = value;
+                  enableUpdateButton();
                 },
+                initialValue: form['name'],
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -64,7 +65,9 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 ),
                 onChanged: (value) {
                   form['lat'] = double.parse(value);
+                  enableUpdateButton();
                 },
+                initialValue: form['lat'].toString(),
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -73,26 +76,33 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 ),
                 onChanged: (value) {
                   form['long'] = double.parse(value);
+                  enableUpdateButton();
                 },
+                initialValue: form['long'].toString(),
               ),
               const SizedBox(height: 30),
               DropdownButtonFormField<String>(
                 hint: const Text("العامل المسؤول"),
+                value: form['workerId'],
                 onChanged: (id) {
                   form['workerId'] = id;
                   form['workerFullName'] =
                       workers.firstWhere((w) => w.id == id).name;
+                  enableUpdateButton();
                 },
                 items: [
                   for (var worker in workers)
                     DropdownMenuItem(
-                        child: Text(worker.name ?? ''), value: worker.id)
+                      child: Text(worker.name ?? ''),
+                      value: worker.id,
+                    )
                 ],
               ),
               const SizedBox(height: 60),
-              _AddButton(
-                onPressed: addLocation,
+              _UpdateButton(
+                onPressed: updateLocation,
                 showLoading: isLoading,
+                isEnabled: updateButtonisEnabled,
               )
             ],
           ),
@@ -101,19 +111,30 @@ class _AddNewLocationState extends State<AddNewLocation> {
     );
   }
 
+  var locationsApiService = LocationsApiService();
+  var applicationUsersApiService = ApplicationUsersApiService();
+
   void changeLoadingState() {
     setState(() {
       isLoading = !isLoading;
     });
   }
 
-  void addLocation() async {
+  void enableUpdateButton() {
+    if (!updateButtonisEnabled) {
+      setState(() {
+        updateButtonisEnabled = true;
+      });
+    }
+  }
+
+  void updateLocation() async {
     changeLoadingState();
-    await locationsApiService.addLocation(form);
+    await locationsApiService.updateLocation(widget.location.id, form);
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,
-      'تمت الإضافة بنجاح',
+      'تم التعديل بنجاح',
       (_) => Navigator.of(context).pop(),
     );
   }
@@ -124,12 +145,17 @@ class _AddNewLocationState extends State<AddNewLocation> {
   }
 }
 
-class _AddButton extends StatelessWidget {
-  const _AddButton({Key? key, this.showLoading = false, this.onPressed})
-      : super(key: key);
+class _UpdateButton extends StatelessWidget {
+  const _UpdateButton({
+    Key? key,
+    this.showLoading = false,
+    this.isEnabled = true,
+    this.onPressed,
+  }) : super(key: key);
 
   final bool showLoading;
-  final VoidCallback? onPressed;
+  final bool isEnabled;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -139,19 +165,18 @@ class _AddButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onPressed: onPressed,
+      onPressed: isEnabled ? onPressed : null,
       child: showLoading
           ? const Center(
               child: SizedBox(
-                height: 25,
-                width: 25,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+              height: 25,
+              width: 25,
+              child: CircularProgressIndicator(
+                color: Colors.white,
               ),
-            )
+            ))
           : const Text(
-              'إضافة',
+              'حفظ',
               style: TextStyle(fontSize: 18),
             ),
     );

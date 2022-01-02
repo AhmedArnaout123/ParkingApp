@@ -7,13 +7,16 @@ class User {
 
   String? name;
 
-  static User fromMap(Map<String, dynamic> json) {
+  double? balance;
+
+  static User fromMap(Map<String, dynamic> map) {
     var user = User();
 
-    user.id = json['id'];
-    user.phoneNumber = json['phoneNumber'];
-    user.role = json['role'];
-    user.name = json['name'];
+    user.id = map['id'];
+    user.phoneNumber = map['phoneNumber'];
+    user.role = map['role'];
+    user.name = map['name'];
+    user.balance = map['balance'];
 
     return user;
   }
@@ -25,12 +28,8 @@ class User {
     map['phoneNumber'] = phoneNumber;
     map['role'] = role;
     map['name'] = name;
+    map['balance'] = name;
 
     return map;
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }

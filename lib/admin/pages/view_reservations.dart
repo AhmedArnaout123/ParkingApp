@@ -19,7 +19,7 @@ class _ViewReservationState extends State<ViewReservation> {
     reservationsStream.listen((event) {
       reservations = [];
       for (var doc in event.docs) {
-        var data = doc.data() as Map<String, dynamic> ?? <String, dynamic>{};
+        var data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
         var map = {'id': doc.id, ...data};
         print(map);
         reservations.add(Reservation.fromMap(map));

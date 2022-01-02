@@ -1,7 +1,11 @@
+import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
+
 class Location {
   String? id;
 
   String? workerId;
+
+  String? workerFullName;
 
   String? name;
 
@@ -9,18 +13,18 @@ class Location {
 
   double? lat;
 
-  bool? isReserved;
+  String? state;
 
   static Location fromMap(Map<String, dynamic> map) {
     var location = Location();
 
     location.id = map['id'];
-    location.isReserved = map['isReserved'];
+    location.state = map['state'];
     location.lat = map['lat'];
     location.long = map['long'];
     location.name = map['name'];
     location.workerId = map['workerId'];
-
+    location.workerFullName = map['workerFullName'];
     return location;
   }
 
@@ -28,13 +32,25 @@ class Location {
     var map = <String, dynamic>{};
 
     map['id'] = id;
-    map['isReserved'] = isReserved;
+    map['state'] = state;
     map['lat'] = lat;
     map['long'] = long;
     map['name'] = name;
     map['workerId'] = workerId;
-
+    map['workerFullName'] = workerFullName;
     return map;
+  }
+
+  bool isAvailable() {
+    return state == ConstantsHelper.locationStates[0];
+  }
+
+  bool isPended() {
+    return state == ConstantsHelper.locationStates[1];
+  }
+
+  bool isReserved() {
+    return state == ConstantsHelper.locationStates[2];
   }
 
   @override

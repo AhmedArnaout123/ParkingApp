@@ -1,0 +1,50 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:parking_graduation_app_1/core/models/location.dart';
+
+class LocationsApiService {
+  var collection = FirebaseFirestore.instance.collection('locations');
+
+  Future<List<Location>> getLocations() async {
+    List<Location> locations = [];
+    await collection.get().then((query) {
+      for (var doc in query.docs) {
+        var map = {
+          'id': doc.id,
+          ...doc.data(),
+        };
+        locations.add(Location.fromMap(map));
+      }
+    });
+
+    return locations;
+  }
+
+  Future<List<Location>> getWorkerLocations(String workerId) async {
+    List<Location> locations = [];
+    await collection.where('workerId', isEqualTo: workerId).get().then((query) {
+      for (var doc in query.docs) {
+        var map = {
+          'id': doc.id,
+          ...doc.data(),
+        };
+        locations.add(Location.fromMap(map));
+      }
+    });
+
+    return locations;
+  }
+
+  Future<String> addLocation(Map<String, dynamic> data) async {
+    String id = "";
+    await collection.add(data).then((doc) => id == doc.id);
+    return id;
+  }
+
+  Future<void> updateLocation(String? id, Map<String, dynamic> data) async {
+    await collection.doc(id).set(data);
+  }
+
+  Future<void> deleteLocation(String id) async {
+    collection.doc(id).delete();
+  }
+}

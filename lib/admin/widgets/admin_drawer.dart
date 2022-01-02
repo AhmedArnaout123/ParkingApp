@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
+import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_reservations.dart';
 
 class AdminDrawer extends StatelessWidget {
@@ -55,44 +55,18 @@ class AdminDrawer extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
                   label: const Text(
-                    'موقع جديد',
+                    'المواقع',
                     style: TextStyle(fontSize: 18, color: Colors.black),
                   ),
                   onPressed: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                          builder: (context) => const AddNewLocation())),
+                    MaterialPageRoute(
+                        builder: (context) => const ViewLocations()),
+                  ),
                   icon: const Icon(Icons.place, color: Colors.black),
                 ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DrawerItem extends StatelessWidget {
-  const _DrawerItem(this.text, this.icon, this.onTap, {Key? key})
-      : super(key: key);
-
-  final String text;
-  final void Function() onTap;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      title: Align(
-        alignment: Alignment.centerRight,
-        child: TextButton.icon(
-          label: Text(
-            text,
-            style: const TextStyle(fontSize: 18, color: Colors.black),
-          ),
-          onPressed: () {},
-          icon: Icon(icon, color: Colors.black),
         ),
       ),
     );

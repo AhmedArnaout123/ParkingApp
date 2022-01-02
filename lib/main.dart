@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
+import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
 import 'package:parking_graduation_app_1/pages/booking_page.dart';
 import 'package:parking_graduation_app_1/pages/home_page.dart';
 import 'package:parking_graduation_app_1/pages/login_page.dart';
 import 'package:parking_graduation_app_1/pages/map_page.dart';
 import 'package:parking_graduation_app_1/core/services/geo_locator_service.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
+import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -71,7 +73,33 @@ class _AppInitializerState extends State<AppInitializer> {
   @override
   Widget build(BuildContext context) {
     if (initializerSucceeded) {
-      return AddNewLocation();
+      return Scaffold(
+        body: ListView(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => ViewLocations()));
+              },
+              child: Text('ADMINS'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => ViewWorkerLocations()));
+              },
+              child: Text('WORKERS'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => ViewLocations()));
+              },
+              child: Text('USERS'),
+            ),
+          ],
+        ),
+      );
       // if (token != null)
       //   return HomePage();
       // else

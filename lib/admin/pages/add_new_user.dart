@@ -82,10 +82,6 @@ class _AddNewUserState extends State<AddNewUser> {
                 },
                 items: const [
                   DropdownMenuItem(
-                    child: Text('مستخدم'),
-                    value: 'user',
-                  ),
-                  DropdownMenuItem(
                     child: Text('عامل'),
                     value: 'worker',
                   ),
@@ -110,7 +106,7 @@ class _AddButton extends StatelessWidget {
       : super(key: key);
 
   final bool showLoading;
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
