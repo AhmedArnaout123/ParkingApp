@@ -9,7 +9,7 @@ import 'package:parking_graduation_app_1/users/booking_page.dart';
 import 'package:parking_graduation_app_1/users/home_page.dart';
 import 'package:parking_graduation_app_1/users/login_page.dart';
 import 'package:parking_graduation_app_1/users/map_page.dart';
-import 'package:parking_graduation_app_1/core/services/geo_locator_service.dart';
+import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 import 'package:provider/provider.dart';
@@ -22,20 +22,16 @@ void main() {
 class ParkingApp extends StatelessWidget {
   ParkingApp({Key? key}) : super(key: key);
 
-  final _locatorService = GeoLocatorService();
+  final _geoCordinatesService = GeoCordinatesService();
   @override
   Widget build(BuildContext context) {
-    return FutureProvider<Position>(
-      initialData: _locatorService.initialPosition,
-      create: (context) => _locatorService.getLocation(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Parking App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const AppInitializer(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Parking App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      home: const AppInitializer(),
     );
   }
 }
@@ -108,8 +104,8 @@ class _AppInitializerState extends State<AppInitializer> {
                     .setId('2NT2V8WobYs3PQjogsZb');
                 await CurrentApplicationUserService().setName('محمد محمود');
                 await CurrentApplicationUserService().setRole('user');
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ViewLocations()));
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const HomePage()));
               },
             ),
           ],

@@ -1,8 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
-class GeoLocatorService {
-  GeoLocatorService();
-
+class GeoCordinatesService {
   Future<Position> getLocation() async {
     print(await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.best,
@@ -12,10 +10,10 @@ class GeoLocatorService {
     );
   }
 
-  Position get initialPosition {
+  Position get deafultPosition {
     return Position(
-      latitude: 0,
-      longitude: 0,
+      latitude: 36.216667,
+      longitude: 37.166668,
       timestamp: DateTime.now(),
       accuracy: 0.0,
       altitude: 0.0,
@@ -25,21 +23,20 @@ class GeoLocatorService {
     );
   }
 
-  bool isInitialPostion(Position p) {
-    return p.latitude == 0 && p.longitude == 0;
+  bool isDefaultPosition(Position p) {
+    return p.latitude == 36.216667 && p.longitude == 37.166668;
   }
 
-  Future<double> getDistance(
-    double startLatitude,
-    double startLongitude,
-    double endLatitude,
-    double endLongitude,
-  ) async {
-    return Geolocator.distanceBetween(
+  Future<double> getDistanceBetween(double startLatitude, double startLongitude,
+      double endLatitude, double endLongitude,
+      [int fractionDigits = 2]) async {
+    var d = Geolocator.distanceBetween(
       startLatitude,
       startLongitude,
       endLatitude,
       endLongitude,
     );
+    d = double.parse(d.toStringAsFixed(fractionDigits));
+    return d;
   }
 }

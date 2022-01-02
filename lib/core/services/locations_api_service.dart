@@ -63,4 +63,20 @@ class LocationsApiService {
         .doc(id)
         .update({'state': ConstantsHelper.locationStates[0]});
   }
+
+  Future<List<Location>> getAvailableLocations() async {
+    List<Location> locations = [];
+
+    await _collection
+        .where('state', isEqualTo: ConstantsHelper.locationStates[0])
+        .get()
+        .then((query) {
+      for (var doc in query.docs) {
+        var map = {'id': doc.id, ...doc.data()};
+        locations.add(Location.fromMap(map));
+      }
+    });
+
+    return locations;
+  }
 }

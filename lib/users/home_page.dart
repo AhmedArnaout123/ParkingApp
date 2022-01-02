@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:parking_graduation_app_1/core/services/geo_locator_service.dart';
+import 'package:parking_graduation_app_1/core/models/location.dart';
+import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
+import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,25 +14,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GoogleMapController? mapController;
-  CollectionReference? locations;
+
+  List<Location> availableLocations = [];
   Set<Marker> markers = {};
+
+  var locationsApiService = LocationsApiService();
+  var geoCordinatesService = GeoCordinatesService();
+
+  Location? selectedLocation;
+  Position? currentPosition;
+  double? distanceFromCurrentPosition;
 
   @override
   void initState() {
     super.initState();
-    GeoLocatorService().getLocation().then((Position position) async {
-      while (mapController == null) {
-        await Future.delayed(const Duration(seconds: 1));
-      }
-      mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 15,
-          ),
-        ),
-      );
-    });
+    getCurrentPosition();
+    getLocations();
   }
 
   @override
@@ -44,8 +42,13 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.6,
               child: GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                    target: LatLng(36.202105, 37.134260), zoom: 15),
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    geoCordinatesService.deafultPosition.latitude,
+                    geoCordinatesService.deafultPosition.longitude,
+                  ),
+                  zoom: 15,
+                ),
                 onMapCreated: (c) {
                   mapController = c;
                 },
@@ -72,18 +75,19 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           flex: 3,
                           child: Column(
-                            children: const [
-                              Icon(Icons.place),
-                              Text('Al-Jamiliah - Iskandaron Street'),
-                              Text('No:12')
+                            children: [
+                              const Icon(Icons.place),
+                              Text(
+                                  selectedLocation?.name ?? 'اضغط لاختيار موقع')
                             ],
                           ),
                         ),
                         Expanded(
                           child: Column(
-                            children: const [
-                              Icon(Icons.car_rental),
-                              Text('3km')
+                            children: [
+                              const Icon(Icons.car_rental),
+                              Text(
+                                  distanceFromCurrentPosition?.toString() ?? '')
                             ],
                           ),
                         )
@@ -102,26 +106,18 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           onPressed: () {
-                            locations = FirebaseFirestore.instance
-                                .collection('locations');
-                            locations?.get().then((value) {
-                              for (var doc in value.docs) {
-                                var data = doc.data()! as Map<String, dynamic>;
-                                print(data);
-                                markers.add(Marker(
-                                  markerId: MarkerId('${data['number']}'),
-                                  position: LatLng(data['lat'], data['long']),
-                                ));
-                              }
-                              setState(() {});
-                            });
-                            // FirebaseFirestore.instance
-                            //     .collection('locations')
-                            //     .add({
-                            //   'number': 2,
-                            //   'address': 'Salah Al-deen',
-                            //   'lat': 36.1866124,
-                            //   'long': 37.124222
+                            // locations = FirebaseFirestore.instance
+                            //     .collection('locations');
+                            // locations?.get().then((value) {
+                            //   for (var doc in value.docs) {
+                            //     var data = doc.data()! as Map<String, dynamic>;
+                            //     print(data);
+                            //     markers.add(Marker(
+                            //       markerId: MarkerId('${data['number']}'),
+                            //       position: LatLng(data['lat'], data['long']),
+                            //     ));
+                            //   }
+                            //   setState(() {});
                             // });
                           },
                           child: const Text(
@@ -152,5 +148,57 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  void getCurrentPosition() async {
+    currentPosition = await geoCordinatesService.getLocation();
+
+    while (mapController == null) {
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+
+    if (currentPosition != null) {
+      mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              currentPosition?.latitude ?? 0,
+              currentPosition?.longitude ?? 0,
+            ),
+            zoom: 15,
+          ),
+        ),
+      );
+    }
+  }
+
+  void getLocations() async {
+    availableLocations = await locationsApiService.getAvailableLocations();
+    for (var location in availableLocations) {
+      markers.add(Marker(
+        markerId: MarkerId(location.id ?? ''),
+        position: LatLng(location.lat ?? 0, location.long ?? 0),
+        onTap: () async {
+          while (currentPosition == null) {
+            await Future.delayed(const Duration(milliseconds: 300));
+          }
+          distanceFromCurrentPosition =
+              await geoCordinatesService.getDistanceBetween(
+            currentPosition?.latitude ?? 0,
+            currentPosition?.longitude ?? 0,
+            location.lat ?? 0,
+            location.long ?? 0,
+          );
+          print(distanceFromCurrentPosition);
+          distanceFromCurrentPosition =
+              distanceFromCurrentPosition ?? 0 / 1000.0;
+          print(distanceFromCurrentPosition ?? 0 / 1000.0);
+          setState(() {
+            selectedLocation = location;
+          });
+        },
+      ));
+    }
+    setState(() {});
   }
 }
