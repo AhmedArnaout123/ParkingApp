@@ -16,7 +16,7 @@ class User {
     user.phoneNumber = map['phoneNumber'];
     user.role = map['role'];
     user.name = map['name'];
-    user.balance = map['balance'];
+    user.balance = map['balance'] + 0.0;
 
     return user;
   }

@@ -4,4 +4,6 @@ class ConstantsHelper {
     "Pended",
     "Reserved"
   ];
+
+  static const List<String> reservationStates = ['Finished', 'UnFinished'];
 }

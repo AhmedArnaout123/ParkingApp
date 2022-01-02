@@ -3,9 +3,17 @@ class Reservation {
 
   String? userId;
 
+  String? userFullName;
+
+  String? workerId;
+
+  String? workerFullName;
+
   String? locationId;
 
-  double? time;
+  String? locationName;
+
+  double? hours;
 
   String? startDate;
 
@@ -13,16 +21,23 @@ class Reservation {
 
   double? cost;
 
+  bool? isFinished;
+
   static Reservation fromMap(Map<String, dynamic> map) {
     var res = Reservation();
 
     res.id = map['id'];
+    res.userId = map['userId'];
+    res.userFullName = map['userFullName'];
+    res.workerId = map['workerId'];
+    res.workerFullName = map['workerFullName'];
+    res.locationId = map['locationId'];
+    res.locationName = map['locationName'];
     res.cost = map['cost'];
     res.endDate = map['endDate'];
     res.startDate = map['startDate'];
-    res.locationId = map['locationId'];
-    res.userId = map['userId'];
-    res.time = map['time'];
+    res.hours = map['hours'];
+    res.isFinished = map['isFinished'];
 
     return res;
   }
@@ -31,13 +46,17 @@ class Reservation {
     var map = <String, dynamic>{};
 
     map['id'] = id;
+    map['userId'] = userId;
+    map['userFullName'] = userFullName;
+    map['wokerId'] = workerId;
+    map['wokerFullName'] = workerFullName;
+    map['locationId'] = locationId;
+    map['locationName'] = locationName;
     map['cost'] = cost;
     map['endDate'] = endDate;
     map['startDate'] = startDate;
-    map['locationId'] = locationId;
-    map['userId'] = userId;
-    map['time'] = time;
-
+    map['hours'] = hours;
+    map['isFinished'] = isFinished;
     return map;
   }
 

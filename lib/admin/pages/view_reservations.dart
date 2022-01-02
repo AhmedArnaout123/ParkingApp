@@ -125,7 +125,7 @@ class _ReservationCardState extends State<_ReservationCard> {
           Text('البدء:${widget.reservation.startDate}'),
           Text('الانتهاء:${widget.reservation.endDate}'),
           Text('السعر:${widget.reservation.cost}'),
-          Text('المدة:${widget.reservation.time}/سا'),
+          Text('المدة:${widget.reservation.hours}/سا'),
         ],
       ),
     );

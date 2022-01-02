@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
+import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
 import 'package:parking_graduation_app_1/pages/booking_page.dart';
 import 'package:parking_graduation_app_1/pages/home_page.dart';
 import 'package:parking_graduation_app_1/pages/login_page.dart';
@@ -22,7 +23,6 @@ class ParkingApp extends StatelessWidget {
   ParkingApp({Key? key}) : super(key: key);
 
   final _locatorService = GeoLocatorService();
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   Widget build(BuildContext context) {
     return FutureProvider<Position>(
@@ -77,25 +77,40 @@ class _AppInitializerState extends State<AppInitializer> {
         body: ListView(
           children: [
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => ViewLocations()));
-              },
-              child: Text('ADMINS'),
-            ),
-            ElevatedButton(
-              onPressed: () {
+              child: const Text('ADMINS'),
+              onPressed: () async {
+                await CurrentApplicationUserService()
+                    .setId('vQXl9PT5L9ubatxcASos');
+                await CurrentApplicationUserService().setName('Ahmed');
+                await CurrentApplicationUserService().setRole('admin');
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => ViewWorkerLocations()));
+                    MaterialPageRoute(builder: (_) => const ViewLocations()));
               },
-              child: Text('WORKERS'),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => ViewLocations()));
+              child: const Text('WORKERS'),
+              onPressed: () async {
+                await CurrentApplicationUserService()
+                    .setId('g4tA3hW2h2Bl5NLRTJG8');
+                await CurrentApplicationUserService().setName('islam');
+                await CurrentApplicationUserService().setRole('worker');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ViewWorkerLocations(),
+                  ),
+                );
               },
-              child: Text('USERS'),
+            ),
+            ElevatedButton(
+              child: const Text('USERS'),
+              onPressed: () async {
+                await CurrentApplicationUserService()
+                    .setId('2NT2V8WobYs3PQjogsZb');
+                await CurrentApplicationUserService().setName('محمد محمود');
+                await CurrentApplicationUserService().setRole('user');
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ViewLocations()));
+              },
             ),
           ],
         ),
@@ -106,7 +121,7 @@ class _AppInitializerState extends State<AppInitializer> {
       //   return LoginPage();
     }
     if (initializerFailed) {
-      return _InitializtionError();
+      return const _InitializtionError();
     }
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
