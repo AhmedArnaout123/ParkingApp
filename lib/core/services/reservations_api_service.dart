@@ -7,7 +7,7 @@ class ReservationsApiService {
 
   Future<String> addReservation(Map<String, dynamic> data) async {
     String id = "";
-    await collection.add(data).then((doc) => id == doc.id);
+    await collection.add(data).then((doc) => id = doc.id);
     return id;
   }
 

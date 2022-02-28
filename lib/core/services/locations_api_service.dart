@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
@@ -20,22 +22,21 @@ class LocationsApiService {
     return locations;
   }
 
-  Future<List<Location>> getWorkerLocations(String workerId) async {
-    List<Location> locations = [];
-    await _collection
-        .where('workerId', isEqualTo: workerId)
-        .get()
-        .then((query) {
-      for (var doc in query.docs) {
+  Stream<List<Location>> getWorkerLocations(String workerId) {
+    var streamController = StreamController<List<Location>>();
+
+    _collection.snapshots().listen((event) {
+      var locations = event.docs.map((doc) {
         var map = {
           'id': doc.id,
           ...doc.data(),
         };
-        locations.add(Location.fromMap(map));
-      }
-    });
+        return Location.fromMap(map);
+      }).toList();
 
-    return locations;
+      streamController.add(locations);
+    });
+    return streamController.stream;
   }
 
   Future<String> addLocation(Map<String, dynamic> data) async {
@@ -52,16 +53,18 @@ class LocationsApiService {
     await _collection.doc(id).delete();
   }
 
-  Future<void> reserveLocation(String? id) async {
-    await _collection
-        .doc(id)
-        .update({'state': ConstantsHelper.locationStates[2]});
+  Future<void> reserveLocation(String id, String currentReservationId) async {
+    await _collection.doc(id).update({
+      'state': ConstantsHelper.locationStates[2],
+      'currentReservationId': currentReservationId,
+    });
   }
 
   Future<void> releaseLocation(String? id) async {
-    await _collection
-        .doc(id)
-        .update({'state': ConstantsHelper.locationStates[0]});
+    await _collection.doc(id).update({
+      'state': ConstantsHelper.locationStates[0],
+      'currentReservationId': null,
+    });
   }
 
   Future<List<Location>> getAvailableLocations() async {

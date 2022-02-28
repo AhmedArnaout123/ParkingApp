@@ -14,15 +14,13 @@ class ViewWorkerLocations extends StatefulWidget {
 }
 
 class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
-  List<Location> locations = [];
-
   final _locationsApiService = LocationsApiService();
   final _reservationsApiService = ReservationsApiService();
 
   @override
   void initState() {
     super.initState();
-    getLocations();
+    //getLocations();
   }
 
   @override
@@ -31,7 +29,7 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: RefreshIndicator(
-          onRefresh: () async => getLocations(),
+          onRefresh: () async => () {}, // getLocations(),
           child: Scaffold(
             appBar: AppBar(
               title: Text('المواقع'),
@@ -39,13 +37,28 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
             drawer: const WorkerDrawer(),
             body: ListView(
               children: [
-                for (var location in locations)
-                  _LocationCard(
-                    location: location,
-                    onTraillingTap: (location.isReserved())
-                        ? () => releasLocation(location.id)
-                        : () => reserveLocation(location),
-                  )
+                StreamBuilder<List<Location>>(
+                  stream: _locationsApiService
+                      .getWorkerLocations('g4tA3hW2h2Bl5NLRTJG8'),
+                  builder: (context, snap) {
+                    if (snap.hasData) {
+                      List<Location> locations = snap.data!;
+                      return Column(
+                        children: locations
+                            .map(
+                              (location) => _LocationCard(
+                                location: location,
+                                onTraillingTap: (location.isReserved())
+                                    ? () => releasLocation(location.id)
+                                    : () => reserveLocation(location),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    }
+                    return Container();
+                  },
+                )
               ],
             ),
           ),
@@ -54,17 +67,17 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
     );
   }
 
-  void getLocations() async {
-    locations =
-        await _locationsApiService.getWorkerLocations('g4tA3hW2h2Bl5NLRTJG8');
-    setState(() {});
-  }
+  // void getLocations() async {
+  //   locations =
+  //       await _locationsApiService.getWorkerLocations('g4tA3hW2h2Bl5NLRTJG8');
+  //   setState(() {});
+  // }
 
   void reserveLocation(Location location) async {
     await Navigator.of(context)
         .push(MaterialPageRoute(builder: (_) => AddReservation(location)));
-    getLocations();
-    setState(() {});
+    // getLocations();
+    //setState(() {});
   }
 
   void releasLocation(String? id) async {
@@ -75,8 +88,8 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
 
     await _reservationsApiService.finishLocationReservation(id);
     await _locationsApiService.releaseLocation(id);
-    getLocations();
-    setState(() {});
+    // // getLocations();
+    // setState(() {});
   }
 }
 
@@ -94,8 +107,6 @@ class _LocationCard extends StatelessWidget {
     var stateColor = Colors.red;
     if (location.isAvailable()) {
       stateColor = Colors.green;
-    } else if (location.isPended()) {
-      stateColor = Colors.orange;
     }
     return Container(
       color: Colors.blue[50],
@@ -110,21 +121,23 @@ class _LocationCard extends StatelessWidget {
             color: stateColor,
           ),
         ),
-        title: Text(location.name ?? ''),
-        trailing: !location.isPended()
-            ? TextButton(
-                onPressed: onTraillingTap,
-                child: Text(
-                  location.isAvailable() ? 'حجز' : 'إنهاء الحجز',
-                  style: TextStyle(
-                    color: location.isAvailable()
-                        ? Colors.green[300]
-                        : Colors.red[300],
-                  ),
-                ),
-              )
-            : null,
+        title: InkWell(
+          child: Text(location.name ?? ''),
+          onTap: showLocationReserveationInfo,
+        ),
+        trailing: TextButton(
+          onPressed: onTraillingTap,
+          child: Text(
+            location.isAvailable() ? 'حجز' : 'إنهاء الحجز',
+            style: TextStyle(
+              color:
+                  location.isAvailable() ? Colors.green[300] : Colors.red[300],
+            ),
+          ),
+        ),
       ),
     );
   }
+
+  void showLocationReserveationInfo() {}
 }

@@ -22,7 +22,8 @@ class _AddNewLocationState extends State<AddNewLocation> {
     'long': 0.0,
     'state': ConstantsHelper.locationStates[0],
     'workerId': '',
-    'workerFullName': ''
+    'workerFullName': '',
+    'currentReservationId': null
   };
 
   List<Worker> workers = [];

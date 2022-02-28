@@ -15,6 +15,7 @@ class AddPayment extends StatefulWidget {
 class _AddPaymentState extends State<AddPayment> {
   Map<String, dynamic> form = {};
 
+  bool isExternalCustomer = false;
   var isLoading = false;
   List<User> users = [];
 
@@ -41,8 +42,7 @@ class _AddPaymentState extends State<AddPayment> {
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             children: [
-              const SizedBox(height: 40),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
               TextFormField(
                 decoration: const InputDecoration(
                   hintText: 'المبلغ',
@@ -58,11 +58,13 @@ class _AddPaymentState extends State<AddPayment> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<User>(
-                      onChanged: (user) {
-                        selectedUser = user;
-                        form['userFullName'] = user?.name;
-                        form['userId'] = user?.id;
-                      },
+                      onChanged: isExternalCustomer
+                          ? null
+                          : (user) {
+                              selectedUser = user;
+                              form['userFullName'] = user?.name;
+                              form['userId'] = user?.id;
+                            },
                       items: [
                         for (var user in users)
                           DropdownMenuItem(
@@ -76,6 +78,23 @@ class _AddPaymentState extends State<AddPayment> {
                     ),
                   )
                 ],
+              ),
+              const SizedBox(height: 15),
+              CheckboxListTile(
+                value: isExternalCustomer,
+                title: Text('زبون خارجي'),
+                onChanged: (value) {
+                  setState(() {
+                    isExternalCustomer = !isExternalCustomer;
+                    if (isExternalCustomer) {
+                      form['userFullName'] = 'زبون خارجي';
+                      form['userId'] = null;
+                    } else {
+                      form['userFullName'] = selectedUser?.name;
+                      form['userId'] = selectedUser?.id;
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 80),
               _AddButton(

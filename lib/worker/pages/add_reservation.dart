@@ -16,7 +16,7 @@ class AddReservation extends StatefulWidget {
 
 class _AddReservationState extends State<AddReservation> {
   var reservationCategories = [
-    <String, dynamic>{'text': '30 min', 'price': 300, 'hours': 0.5},
+    <String, dynamic>{'text': '30 min', 'price': 300.0, 'hours': 0.5},
     {'text': '1 hour', 'price': 500.0, 'hours': 1.0},
     {'text': '2 hours', 'price': 1000.0, 'hours': 2.0},
     {'text': '3 hours', 'price': 1500.0, 'hours': 3.0},
@@ -173,7 +173,8 @@ class _AddReservationState extends State<AddReservation> {
       'locationName': widget.location.name,
       'startDate': startDate.toString().substring(0, 16),
       'endDate': endDate.toString().substring(0, 16),
-      'isFinished': false
+      'isFinished': false,
+      'cost': selectedReservation['price']
     };
   }
 
@@ -196,8 +197,11 @@ class _AddReservationState extends State<AddReservation> {
 
   void addReservation() async {
     changeLoadingState();
-    await reservationsApiService.addReservation(form);
-    await locationsApiService.reserveLocation(widget.location.id);
+    var reservationId = await reservationsApiService.addReservation(form);
+    await locationsApiService.reserveLocation(
+      widget.location.id!,
+      reservationId,
+    );
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,

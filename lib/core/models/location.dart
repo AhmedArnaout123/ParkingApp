@@ -5,6 +5,8 @@ class Location {
 
   String? workerId;
 
+  String? currentReservationId;
+
   String? workerFullName;
 
   String? name;
@@ -25,6 +27,7 @@ class Location {
     location.name = map['name'];
     location.workerId = map['workerId'];
     location.workerFullName = map['workerFullName'];
+    location.currentReservationId = map['currentReservationId'];
     return location;
   }
 
@@ -38,15 +41,12 @@ class Location {
     map['name'] = name;
     map['workerId'] = workerId;
     map['workerFullName'] = workerFullName;
+    map['currentReservationId'] = currentReservationId;
     return map;
   }
 
   bool isAvailable() {
     return state == ConstantsHelper.locationStates[0];
-  }
-
-  bool isPended() {
-    return state == ConstantsHelper.locationStates[1];
   }
 
   bool isReserved() {
