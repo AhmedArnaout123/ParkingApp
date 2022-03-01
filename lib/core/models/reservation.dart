@@ -5,6 +5,8 @@ class Reservation {
 
   String? userFullName;
 
+  String? userPhoneNumber;
+
   String? workerId;
 
   String? workerFullName;
@@ -28,6 +30,7 @@ class Reservation {
 
     res.id = map['id'];
     res.userId = map['userId'];
+    res.userPhoneNumber = map['userPhoneNumber'];
     res.userFullName = map['userFullName'];
     res.workerId = map['workerId'];
     res.workerFullName = map['workerFullName'];
@@ -47,6 +50,7 @@ class Reservation {
 
     map['id'] = id;
     map['userId'] = userId;
+    map['userPhoneNumber'] = userPhoneNumber;
     map['userFullName'] = userFullName;
     map['wokerId'] = workerId;
     map['wokerFullName'] = workerFullName;

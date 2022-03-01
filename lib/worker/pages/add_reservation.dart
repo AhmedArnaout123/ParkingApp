@@ -15,8 +15,8 @@ class AddReservation extends StatefulWidget {
 }
 
 class _AddReservationState extends State<AddReservation> {
-  var reservationCategories = [
-    <String, dynamic>{'text': '30 min', 'price': 300.0, 'hours': 0.5},
+  List<Map<String, dynamic>> reservationCategories = [
+    {'text': '30 min', 'price': 300.0, 'hours': 0.5},
     {'text': '1 hour', 'price': 500.0, 'hours': 1.0},
     {'text': '2 hours', 'price': 1000.0, 'hours': 2.0},
     {'text': '3 hours', 'price': 1500.0, 'hours': 3.0},
@@ -24,15 +24,12 @@ class _AddReservationState extends State<AddReservation> {
     {'text': '5 hours', 'price': 2500.0, 'hours': 5.0},
     {'text': '6 hours', 'price': 3000.0, 'hours': 6.0}
   ];
-  List<User> users = [];
 
   Map<String, dynamic> form = {};
   Map<String, dynamic> selectedReservation = {};
-  User? selectedUser;
 
   var isLoading = false;
 
-  var applicationUsersApiService = ApplicationUsersApiService();
   var reservationsApiService = ReservationsApiService();
   var locationsApiService = LocationsApiService();
 
@@ -40,7 +37,6 @@ class _AddReservationState extends State<AddReservation> {
   void initState() {
     super.initState();
     selectedReservation = reservationCategories[1];
-    getUsers();
     initializeForm();
   }
 
@@ -114,27 +110,22 @@ class _AddReservationState extends State<AddReservation> {
                 ],
               ),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text('المستخدم:', style: customTextStyle),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: DropdownButtonFormField<User>(
-                      onChanged: (user) {
-                        selectedUser = user;
-                        form['userFullName'] = user?.name;
-                        form['userId'] = user?.id;
-                      },
-                      items: [
-                        for (var user in users)
-                          DropdownMenuItem(
-                            child: Text('${user.name} - ${user.userName}'),
-                            value: user,
-                          ),
-                      ],
-                    ),
-                  )
-                ],
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'الاسم',
+                ),
+                onChanged: (value) {
+                  form['userFullName'] = value;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'رقم الهاتف',
+                ),
+                onChanged: (value) {
+                  form['userPhoneNumber'] = value;
+                },
               ),
               const SizedBox(height: 80),
               _AddButton(
@@ -154,11 +145,6 @@ class _AddReservationState extends State<AddReservation> {
     });
   }
 
-  void getUsers() async {
-    users = await applicationUsersApiService.getUsers();
-    setState(() {});
-  }
-
   void initializeForm() async {
     var service = CurrentApplicationUserService();
     var name = await service.getName();
@@ -174,7 +160,8 @@ class _AddReservationState extends State<AddReservation> {
       'startDate': startDate.toString().substring(0, 16),
       'endDate': endDate.toString().substring(0, 16),
       'isFinished': false,
-      'cost': selectedReservation['price']
+      'cost': selectedReservation['price'],
+      'userId': null
     };
   }
 

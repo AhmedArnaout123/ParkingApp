@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
+import 'package:parking_graduation_app_1/core/models/application_users/user.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
+import 'package:parking_graduation_app_1/core/models/reservation.dart';
+import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/add_reservation.dart';
@@ -67,17 +70,9 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
     );
   }
 
-  // void getLocations() async {
-  //   locations =
-  //       await _locationsApiService.getWorkerLocations('g4tA3hW2h2Bl5NLRTJG8');
-  //   setState(() {});
-  // }
-
   void reserveLocation(Location location) async {
     await Navigator.of(context)
         .push(MaterialPageRoute(builder: (_) => AddReservation(location)));
-    // getLocations();
-    //setState(() {});
   }
 
   void releasLocation(String? id) async {
@@ -88,8 +83,6 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
 
     await _reservationsApiService.finishLocationReservation(id);
     await _locationsApiService.releaseLocation(id);
-    // // getLocations();
-    // setState(() {});
   }
 }
 
@@ -97,10 +90,12 @@ class _LocationCard extends StatelessWidget {
   const _LocationCard({
     required this.location,
     this.onTraillingTap,
+    this.locationReservation,
     Key? key,
   }) : super(key: key);
 
   final Location location;
+  final Reservation? locationReservation;
   final VoidCallback? onTraillingTap;
   @override
   Widget build(BuildContext context) {
@@ -125,6 +120,9 @@ class _LocationCard extends StatelessWidget {
           child: Text(location.name ?? ''),
           onTap: showLocationReserveationInfo,
         ),
+        subtitle: location.isReserved()
+            ? LocationReservationInfo(location: location)
+            : null,
         trailing: TextButton(
           onPressed: onTraillingTap,
           child: Text(
@@ -140,4 +138,39 @@ class _LocationCard extends StatelessWidget {
   }
 
   void showLocationReserveationInfo() {}
+}
+
+class LocationReservationInfo extends StatelessWidget {
+  const LocationReservationInfo({required this.location, Key? key})
+      : super(key: key);
+
+  final Location location;
+  //final Reservation locationReservation;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Reservation>(
+      future:
+          ReservationsApiService().getCurrentLocationReservation(location.id),
+      builder: (context1, snapshot1) {
+        if (snapshot1.hasData) {
+          var reservation = snapshot1.data;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                reservation!.endDate!
+                    .substring(reservation.endDate!.length - 5),
+              ),
+              Text(reservation.userFullName!),
+              Text(reservation.userPhoneNumber!)
+            ],
+          );
+          ;
+        }
+        return Container();
+      },
+    );
+  }
 }

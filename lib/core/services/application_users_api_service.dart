@@ -32,4 +32,9 @@ class ApplicationUsersApiService {
 
     return users;
   }
+
+  Future<User> getUser(String? id) async {
+    List<User> users = await getUsers();
+    return users.singleWhere((element) => element.id == id);
+  }
 }
