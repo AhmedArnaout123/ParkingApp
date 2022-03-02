@@ -20,6 +20,11 @@ class ApplicationUsersApiService {
     return workers;
   }
 
+  Future<Worker> getWorker(String? id) async {
+    List<Worker> worker = await getWorkers();
+    return worker.singleWhere((element) => element.id == id);
+  }
+
   Future<List<User>> getUsers() async {
     List<User> users = [];
 

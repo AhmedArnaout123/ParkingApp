@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   List<Location> availableLocations = [];
   Set<Marker> markers = {};
 
-  var locationsApiService = LocationsApiService();
   var geoCordinatesService = GeoCordinatesService();
 
   Location? selectedLocation;
@@ -106,26 +105,18 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => BookingPage()),
-                            );
-                            // locations = FirebaseFirestore.instance
-                            //     .collection('locations');
-                            // locations?.get().then((value) {
-                            //   for (var doc in value.docs) {
-                            //     var data = doc.data()! as Map<String, dynamic>;
-                            //     print(data);
-                            //     markers.add(Marker(
-                            //       markerId: MarkerId('${data['number']}'),
-                            //       position: LatLng(data['lat'], data['long']),
-                            //     ));
-                            //   }
-                            //   setState(() {});
-                            // });
-                          },
+                          onPressed: selectedLocation != null
+                              ? () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (_) => BookingPage(
+                                              location: selectedLocation!,
+                                            )),
+                                  );
+                                }
+                              : null,
                           child: const Text(
-                            'اختيار',
+                            'حجز',
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
@@ -177,7 +168,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getLocations() async {
-    availableLocations = await locationsApiService.getAvailableLocations();
+    availableLocations = await LocationsApiService().getAvailableLocations();
     for (var location in availableLocations) {
       markers.add(Marker(
         markerId: MarkerId(location.id ?? ''),

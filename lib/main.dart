@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
 import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
+import 'package:parking_graduation_app_1/core/models/application_users/worker.dart';
 import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
 import 'package:parking_graduation_app_1/users/booking_page.dart';
 import 'package:parking_graduation_app_1/users/home_page.dart';
@@ -13,6 +14,9 @@ import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.da
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 import 'package:provider/provider.dart';
+
+import 'core/models/application_users/admin.dart';
+import 'core/models/application_users/user.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,10 +79,14 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('ADMINS'),
               onPressed: () async {
-                await CurrentApplicationUserService()
-                    .setId('vQXl9PT5L9ubatxcASos');
-                await CurrentApplicationUserService().setName('Ahmed');
-                await CurrentApplicationUserService().setRole('admin');
+                await CurrentApplicationUserService().setOrUpdateAdmin(
+                  Admin()
+                    ..name = 'Ahmed'
+                    ..role = 'admin'
+                    ..phoneNumber = '0954333322'
+                    ..id = 'vQXl9PT5L9ubatxcASos'
+                    ..userName = 'hellooo',
+                );
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const ViewLocations()));
               },
@@ -86,10 +94,14 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('WORKERS'),
               onPressed: () async {
-                await CurrentApplicationUserService()
-                    .setId('g4tA3hW2h2Bl5NLRTJG8');
-                await CurrentApplicationUserService().setName('islam');
-                await CurrentApplicationUserService().setRole('worker');
+                await CurrentApplicationUserService().setOrUpdateWorker(
+                  Worker()
+                    ..name = 'islam'
+                    ..role = 'worker'
+                    ..phoneNumber = '0987655432'
+                    ..id = 'g4tA3hW2h2Bl5NLRTJG8'
+                    ..userName = 'islam1',
+                );
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => const ViewWorkerLocations(),
@@ -100,10 +112,15 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('USERS'),
               onPressed: () async {
-                await CurrentApplicationUserService()
-                    .setId('2NT2V8WobYs3PQjogsZb');
-                await CurrentApplicationUserService().setName('محمد محمود');
-                await CurrentApplicationUserService().setRole('user');
+                await CurrentApplicationUserService().setOrUpdateUser(
+                  User()
+                    ..name = 'محمد محمود'
+                    ..role = 'user'
+                    ..phoneNumber = '0987665432'
+                    ..id = '2NT2V8WobYs3PQjogsZb'
+                    ..userName = 'mm1'
+                    ..balance = 100,
+                );
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => const HomePage()));
               },

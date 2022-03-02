@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/user.dart';
-import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
@@ -15,28 +14,15 @@ class AddReservation extends StatefulWidget {
 }
 
 class _AddReservationState extends State<AddReservation> {
-  List<Map<String, dynamic>> reservationCategories = [
-    {'text': '30 min', 'price': 300.0, 'hours': 0.5},
-    {'text': '1 hour', 'price': 500.0, 'hours': 1.0},
-    {'text': '2 hours', 'price': 1000.0, 'hours': 2.0},
-    {'text': '3 hours', 'price': 1500.0, 'hours': 3.0},
-    {'text': '4 hours', 'price': 2000.0, 'hours': 4.0},
-    {'text': '5 hours', 'price': 2500.0, 'hours': 5.0},
-    {'text': '6 hours', 'price': 3000.0, 'hours': 6.0}
-  ];
-
   Map<String, dynamic> form = {};
   Map<String, dynamic> selectedReservation = {};
 
   var isLoading = false;
 
-  var reservationsApiService = ReservationsApiService();
-  var locationsApiService = LocationsApiService();
-
   @override
   void initState() {
     super.initState();
-    selectedReservation = reservationCategories[1];
+    selectedReservation = ConstantsHelper.reservationCategories[1];
     initializeForm();
   }
 
@@ -86,7 +72,7 @@ class _AddReservationState extends State<AddReservation> {
                         value: selectedReservation['hours'],
                         onChanged: onTimeSelect,
                         items: [
-                          for (var re in reservationCategories)
+                          for (var re in ConstantsHelper.reservationCategories)
                             DropdownMenuItem(
                               child: Text(re['text']),
                               value: re['hours'] as double,
@@ -146,28 +132,27 @@ class _AddReservationState extends State<AddReservation> {
   }
 
   void initializeForm() async {
-    var service = CurrentApplicationUserService();
-    var name = await service.getName();
-    var id = await service.getId();
+    var worker = await CurrentApplicationUserService().getCurrentWorker();
     var startDate = DateTime.now();
     var endDate = startDate.add(const Duration(hours: 1));
 
     form = {
-      'workerId': id,
-      'workerName': name,
+      'workerId': worker.id,
+      'workerName': worker.name,
       'locationId': widget.location.id,
       'locationName': widget.location.name,
       'startDate': startDate.toString().substring(0, 16),
       'endDate': endDate.toString().substring(0, 16),
       'isFinished': false,
       'cost': selectedReservation['price'],
-      'userId': null
+      'userId': null,
+      'hours': selectedReservation['hours']
     };
   }
 
   void onTimeSelect(double? hours) {
-    selectedReservation =
-        reservationCategories.firstWhere((e) => e['hours'] == hours);
+    selectedReservation = ConstantsHelper.reservationCategories
+        .firstWhere((e) => e['hours'] == hours);
     setState(() {});
 
     form['cost'] = selectedReservation['price'];
@@ -184,8 +169,8 @@ class _AddReservationState extends State<AddReservation> {
 
   void addReservation() async {
     changeLoadingState();
-    var reservationId = await reservationsApiService.addReservation(form);
-    await locationsApiService.reserveLocation(
+    var reservationId = await ReservationsApiService().addReservation(form);
+    await LocationsApiService().reserveLocation(
       widget.location.id!,
       reservationId,
     );

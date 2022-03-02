@@ -1,117 +1,140 @@
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
+import 'package:parking_graduation_app_1/core/models/location.dart';
+import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
+import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({Key? key}) : super(key: key);
+  const BookingPage({Key? key, required this.location}) : super(key: key);
+
+  final Location location;
 
   @override
   _BookingPageState createState() => _BookingPageState();
 }
 
 class _BookingPageState extends State<BookingPage> {
-  var reservationCategories = [
-    {'duration': '30 min', 'price': 300},
-    {'duration': '1 hour', 'price': 500},
-    {'duration': '2 hours', 'price': 1000},
-    {'duration': '3 hours', 'price': 1500},
-    {'duration': '4 hours', 'price': 2000},
-    {'duration': '5 hours', 'price': 2500},
-    {'duration': '6 hours', 'price': 3000}
-  ];
-
-  bool payFromWallet = true;
+  Map<String, dynamic> form = {};
   Map<String, dynamic> selectedReservation = {};
+
+  var isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    selectedReservation = reservationCategories[1];
+    selectedReservation = ConstantsHelper.reservationCategories[1];
+    initializeForm();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: [
-          const _Header(),
-          const SizedBox(height: 30),
-          _TimeLine(selectedReservation['duration']),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 100,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              scrollDirection: Axis.horizontal,
-              itemCount: reservationCategories.length,
-              itemBuilder: (context, i) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedReservation = reservationCategories[i];
-                    });
-                  },
-                  child: ResravationCard(
-                    duration: reservationCategories[i]['duration'] as String,
-                    price: reservationCategories[i]['price'] as int,
-                    isSelected: selectedReservation == reservationCategories[i],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 40),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Select Payment',
-              style: TextStyle(
-                color: Color(0xFF909294),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: ListView(
+          children: [
+            const _Header(),
+            const SizedBox(height: 30),
+            _TimeLine(selectedReservation['text']),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                scrollDirection: Axis.horizontal,
+                itemCount: ConstantsHelper.reservationCategories.length,
+                itemBuilder: (context, i) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedReservation =
+                            ConstantsHelper.reservationCategories[i];
+                      });
+                    },
+                    child: ResravationCard(
+                      duration: ConstantsHelper.reservationCategories[i]['text']
+                          as String,
+                      price: ConstantsHelper.reservationCategories[i]['price']
+                          as double,
+                      isSelected: selectedReservation ==
+                          ConstantsHelper.reservationCategories[i],
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        payFromWallet = true;
-                      });
-                    },
+            const SizedBox(height: 40),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Select Payment',
+                style: TextStyle(
+                  color: Color(0xFF909294),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Expanded(
                     child: _PaymentCard(
-                      icon: Icons.wallet_membership,
+                      icon: Icons.money,
                       text: 'Wallet',
-                      isSelected: payFromWallet,
+                      isSelected: true,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        payFromWallet = false;
-                      });
-                    },
+                  SizedBox(width: 12),
+                  Expanded(
                     child: _PaymentCard(
                       icon: Icons.credit_card,
-                      isSelected: !payFromWallet,
+                      isSelected: false,
                       text: 'Credit Card',
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 30),
-          _ConfirmButton(onPressed: () {}, showLoading: false),
-          const SizedBox(height: 12)
-        ],
+            const SizedBox(height: 30),
+            _ConfirmButton(onPressed: () {}, showLoading: false),
+            const SizedBox(height: 12)
+          ],
+        ),
       ),
     );
+  }
+
+  void changeLoadingState() {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
+  void initializeForm() async {
+    var user = await CurrentApplicationUserService().getCurrentUser();
+    var startDate = DateTime.now();
+    var endDate = startDate.add(const Duration(hours: 1));
+
+    var worker =
+        await ApplicationUsersApiService().getWorker(widget.location.workerId);
+
+    form = {
+      'workerId': worker.id,
+      'workerName': worker.name,
+      'locationId': widget.location.id,
+      'locationName': widget.location.name,
+      'startDate': startDate.toString().substring(0, 16),
+      'endDate': endDate.toString().substring(0, 16),
+      'isFinished': false,
+      'cost': selectedReservation['price'],
+      'userId': user.id,
+      'userFullName': user.name,
+      'hours': selectedReservation['hours']
+    };
   }
 }
 
@@ -168,7 +191,7 @@ class _Header extends StatelessWidget {
 class ResravationCard extends StatelessWidget {
   final bool isSelected;
   final String duration;
-  final int price;
+  final double price;
   const ResravationCard(
       {Key? key, this.isSelected = false, this.duration = '', this.price = 0})
       : super(key: key);
@@ -177,49 +200,53 @@ class ResravationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 120,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Container(
-          decoration: isSelected
-              ? BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
-                    ],
-                    stops: [0.1, 0.4, 0.7, 0.9],
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            decoration: isSelected
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF73AEF5),
+                        Color(0xFF61A4F1),
+                        Color(0xFF478DE0),
+                        Color(0xFF398AE5),
+                      ],
+                      stops: [0.1, 0.4, 0.7, 0.9],
+                    ),
+                  )
+                : null,
+            color: !isSelected ? const Color(0xFFF0F4F7) : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    duration,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                      fontSize: 20,
+                    ),
                   ),
-                )
-              : null,
-          color: !isSelected ? const Color(0xFFF0F4F7) : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  duration,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
-                    fontSize: 20,
+                  const SizedBox(height: 12),
+                  Text(
+                    '${price.toString()} SYP',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF909294),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${price.toString()} SYP',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isSelected ? Colors.white : const Color(0xFF909294),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -259,9 +286,10 @@ class _TimeLine extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'Select hours',
+            'فئة الحجز',
             style: TextStyle(
               color: Color(0xFF909294),
+              fontSize: 18,
             ),
           ),
           Row(

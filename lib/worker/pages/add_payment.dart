@@ -115,10 +115,11 @@ class _AddPaymentState extends State<AddPayment> {
   }
 
   void initializeForm() async {
+    var worker = await currentUserApplicationService.getCurrentWorker();
     form = {
       'amount': 0.0,
-      'workerId': await currentUserApplicationService.getId(),
-      'workerFullName': await currentUserApplicationService.getName(),
+      'workerId': worker.id,
+      'workerFullName': worker.name,
       'date': DateTime.now().toString().substring(0, 16)
     };
   }
