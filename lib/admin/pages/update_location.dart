@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/worker.dart';
+import 'package:parking_graduation_app_1/core/Providers/workers_proivder.dart';
+import 'package:parking_graduation_app_1/core/models/worker.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
 
 class UpdateLocation extends StatefulWidget {
   const UpdateLocation(this.location, {Key? key}) : super(key: key);
@@ -33,7 +33,6 @@ class _UpdateLocationState extends State<UpdateLocation> {
       'workerId': widget.location.workerId,
       'workerFullName': widget.location.workerFullName
     };
-    getWorkers();
   }
 
   @override
@@ -81,22 +80,28 @@ class _UpdateLocationState extends State<UpdateLocation> {
                 initialValue: form['long'].toString(),
               ),
               const SizedBox(height: 30),
-              DropdownButtonFormField<String>(
-                hint: const Text("العامل المسؤول"),
-                value: form['workerId'],
-                onChanged: (id) {
-                  form['workerId'] = id;
-                  form['workerFullName'] =
-                      workers.firstWhere((w) => w.id == id).name;
-                  enableUpdateButton();
+              StreamBuilder<List<Worker>>(
+                stream: WorkersProvider().stream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+                  var workers = snapshot.data;
+                  return DropdownButtonFormField<Worker>(
+                    hint: const Text("العامل المسؤول"),
+                    onChanged: (admin) {
+                      form['workerId'] = admin!.id;
+                      form['workerFullName'] = admin.name;
+                    },
+                    items: [
+                      for (var worker in workers!)
+                        DropdownMenuItem(
+                          child: Text(worker.name!),
+                          value: worker,
+                        )
+                    ],
+                  );
                 },
-                items: [
-                  for (var worker in workers)
-                    DropdownMenuItem(
-                      child: Text(worker.name ?? ''),
-                      value: worker.id,
-                    )
-                ],
               ),
               const SizedBox(height: 60),
               _UpdateButton(
@@ -110,9 +115,6 @@ class _UpdateLocationState extends State<UpdateLocation> {
       ),
     );
   }
-
-  var locationsApiService = LocationsApiService();
-  var applicationUsersApiService = ApplicationUsersApiService();
 
   void changeLoadingState() {
     setState(() {
@@ -130,18 +132,13 @@ class _UpdateLocationState extends State<UpdateLocation> {
 
   void updateLocation() async {
     changeLoadingState();
-    await locationsApiService.updateLocation(widget.location.id, form);
+    await LocationsApiService().updateLocation(widget.location.id, form);
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,
       'تم التعديل بنجاح',
       (_) => Navigator.of(context).pop(),
     );
-  }
-
-  void getWorkers() async {
-    workers = await applicationUsersApiService.getWorkers();
-    setState(() {});
   }
 }
 

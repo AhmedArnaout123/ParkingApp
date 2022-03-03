@@ -1,32 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/worker.dart';
-import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
-import 'package:parking_graduation_app_1/users/booking_page.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/worker_locations_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/worker_payments_provider.dart';
+import 'package:parking_graduation_app_1/core/models/worker.dart';
 import 'package:parking_graduation_app_1/users/home_page.dart';
-import 'package:parking_graduation_app_1/users/login_page.dart';
-import 'package:parking_graduation_app_1/users/map_page.dart';
-import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
-import 'package:provider/provider.dart';
 
-import 'core/models/application_users/admin.dart';
-import 'core/models/application_users/user.dart';
+import 'core/models/admin.dart';
+import 'core/models/user.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(ParkingApp());
+  runApp(const ParkingApp());
 }
 
 class ParkingApp extends StatelessWidget {
-  ParkingApp({Key? key}) : super(key: key);
+  const ParkingApp({Key? key}) : super(key: key);
 
-  final _geoCordinatesService = GeoCordinatesService();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,7 +49,11 @@ class _AppInitializerState extends State<AppInitializer> {
     super.initState();
     Firebase.initializeApp()
         .then((_) async {
-          token = await StorageService().read('token');
+          var role = await StorageService().read('role');
+          var id = await StorageService().read('id');
+          WorkerPaymentsProvider.initialize('g4tA3hW2h2Bl5NLRTJG8');
+          WorkerLocationsProvider.initialize('g4tA3hW2h2Bl5NLRTJG8');
+          CurrentUserProvider.initialize('fUjA9g7Lbyr46F6Equ1F');
         })
         .then((_) => {
               setState(() {
@@ -79,14 +76,6 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('ADMINS'),
               onPressed: () async {
-                await CurrentApplicationUserService().setOrUpdateAdmin(
-                  Admin()
-                    ..name = 'Ahmed'
-                    ..role = 'admin'
-                    ..phoneNumber = '0954333322'
-                    ..id = 'vQXl9PT5L9ubatxcASos'
-                    ..userName = 'hellooo',
-                );
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const ViewLocations()));
               },
@@ -94,14 +83,6 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('WORKERS'),
               onPressed: () async {
-                await CurrentApplicationUserService().setOrUpdateWorker(
-                  Worker()
-                    ..name = 'islam'
-                    ..role = 'worker'
-                    ..phoneNumber = '0987655432'
-                    ..id = 'g4tA3hW2h2Bl5NLRTJG8'
-                    ..userName = 'islam1',
-                );
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => const ViewWorkerLocations(),
@@ -112,15 +93,6 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('USERS'),
               onPressed: () async {
-                await CurrentApplicationUserService().setOrUpdateUser(
-                  User()
-                    ..name = 'محمد محمود'
-                    ..role = 'user'
-                    ..phoneNumber = '0987665432'
-                    ..id = '2NT2V8WobYs3PQjogsZb'
-                    ..userName = 'mm1'
-                    ..balance = 100,
-                );
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (_) => const HomePage()));
               },
@@ -128,10 +100,6 @@ class _AppInitializerState extends State<AppInitializer> {
           ],
         ),
       );
-      // if (token != null)
-      //   return HomePage();
-      // else
-      //   return LoginPage();
     }
     if (initializerFailed) {
       return const _InitializtionError();

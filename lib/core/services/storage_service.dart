@@ -18,8 +18,9 @@ class StorageService {
         return instance.setBool(key, value);
       case String:
         return instance.setString(key, value);
+      case Null:
       default:
-        throw Exception('the value type can\'t be stored');
+        return false;
     }
   }
 

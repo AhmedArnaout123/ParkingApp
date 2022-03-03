@@ -11,6 +11,8 @@ class User {
 
   String? userName;
 
+  String? currentReservationId;
+
   static User fromMap(Map<String, dynamic> map) {
     var user = User();
 
@@ -20,6 +22,7 @@ class User {
     user.name = map['name'];
     user.balance = map['balance'] + 0.0;
     user.userName = map['userName'];
+    user.currentReservationId = map['currentReservationId'];
     return user;
   }
 
@@ -32,6 +35,7 @@ class User {
     map['name'] = name;
     map['balance'] = name;
     map['userName'] = userName;
+    map['currentReservationId'] = currentReservationId;
     return map;
   }
 }

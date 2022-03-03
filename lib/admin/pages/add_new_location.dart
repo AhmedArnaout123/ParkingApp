@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/worker.dart';
+import 'package:parking_graduation_app_1/core/Providers/workers_proivder.dart';
+import 'package:parking_graduation_app_1/core/models/admin.dart';
+import 'package:parking_graduation_app_1/core/models/worker.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
 
 class AddNewLocation extends StatefulWidget {
   const AddNewLocation({Key? key}) : super(key: key);
@@ -26,16 +27,9 @@ class _AddNewLocationState extends State<AddNewLocation> {
     'currentReservationId': null
   };
 
-  List<Worker> workers = [];
-
-  var locationsApiService = LocationsApiService();
-  var applicationUsersApiService = ApplicationUsersApiService();
-
   @override
   void initState() {
     super.initState();
-
-    getWorkers();
   }
 
   @override
@@ -77,18 +71,28 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 },
               ),
               const SizedBox(height: 30),
-              DropdownButtonFormField<String>(
-                hint: const Text("العامل المسؤول"),
-                onChanged: (id) {
-                  form['workerId'] = id;
-                  form['workerFullName'] =
-                      workers.firstWhere((w) => w.id == id).name;
+              StreamBuilder<List<Worker>>(
+                stream: WorkersProvider().stream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+                  var workers = snapshot.data;
+                  return DropdownButtonFormField<Worker>(
+                    hint: const Text("العامل المسؤول"),
+                    onChanged: (admin) {
+                      form['workerId'] = admin!.id;
+                      form['workerFullName'] = admin.name;
+                    },
+                    items: [
+                      for (var worker in workers!)
+                        DropdownMenuItem(
+                          child: Text(worker.name!),
+                          value: worker,
+                        )
+                    ],
+                  );
                 },
-                items: [
-                  for (var worker in workers)
-                    DropdownMenuItem(
-                        child: Text(worker.name ?? ''), value: worker.id)
-                ],
               ),
               const SizedBox(height: 60),
               _AddButton(
@@ -110,18 +114,14 @@ class _AddNewLocationState extends State<AddNewLocation> {
 
   void addLocation() async {
     changeLoadingState();
-    await locationsApiService.addLocation(form);
+    await LocationsApiService().addLocation(form);
+
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,
       'تمت الإضافة بنجاح',
       (_) => Navigator.of(context).pop(),
     );
-  }
-
-  void getWorkers() async {
-    workers = await applicationUsersApiService.getWorkers();
-    setState(() {});
   }
 }
 

@@ -109,9 +109,10 @@ class _HomePageState extends State<HomePage> {
                               ? () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                        builder: (_) => BookingPage(
-                                              location: selectedLocation!,
-                                            )),
+                                      builder: (_) => BookingPage(
+                                        location: selectedLocation!,
+                                      ),
+                                    ),
                                   );
                                 }
                               : null,

@@ -3,8 +3,6 @@ class Admin {
 
   String? phoneNumber;
 
-  String? role;
-
   String? name;
 
   String? userName;
@@ -14,9 +12,19 @@ class Admin {
 
     admin.id = map['id'];
     admin.phoneNumber = map['phoneNumber'];
-    admin.role = map['role'];
     admin.name = map['name'];
     admin.userName = map['userName'];
     return admin;
+  }
+
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{};
+
+    map['id'] = id;
+    map['phoneNumber'] = phoneNumber;
+    map['name'] = 'name';
+    map['userName'] = userName;
+
+    return map;
   }
 }

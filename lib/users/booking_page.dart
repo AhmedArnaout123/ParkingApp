@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
+import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
-import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
+import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
 
@@ -65,42 +66,8 @@ class _BookingPageState extends State<BookingPage> {
                 },
               ),
             ),
-            const SizedBox(height: 40),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Select Payment',
-                style: TextStyle(
-                  color: Color(0xFF909294),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Expanded(
-                    child: _PaymentCard(
-                      icon: Icons.money,
-                      text: 'Wallet',
-                      isSelected: true,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: _PaymentCard(
-                      icon: Icons.credit_card,
-                      isSelected: false,
-                      text: 'Credit Card',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            _ConfirmButton(onPressed: () {}, showLoading: false),
+            const SizedBox(height: 70),
+            _ConfirmButton(onPressed: bookLocation, showLoading: isLoading),
             const SizedBox(height: 12)
           ],
         ),
@@ -115,12 +82,11 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   void initializeForm() async {
-    var user = await CurrentApplicationUserService().getCurrentUser();
+    var user = CurrentUserProvider().user;
     var startDate = DateTime.now();
     var endDate = startDate.add(const Duration(hours: 1));
 
-    var worker =
-        await ApplicationUsersApiService().getWorker(widget.location.workerId);
+    var worker = await UsersApiService().getWorker(widget.location.workerId);
 
     form = {
       'workerId': worker.id,
@@ -136,6 +102,27 @@ class _BookingPageState extends State<BookingPage> {
       'hours': selectedReservation['hours']
     };
   }
+
+  void bookLocation() async {
+    changeLoadingState();
+
+    var user = CurrentUserProvider().user;
+
+    if (user.balance! < selectedReservation['price']) {
+      UiHelper.showDialogWithOkButton(context, 'ليس لديك رصيد كافي للحجز');
+      changeLoadingState();
+      return;
+    }
+
+    var resId = await ReservationsApiService().addReservation(form);
+    await UsersApiService().makeReservation(
+      user.id!,
+      user.balance! - selectedReservation['price'],
+      resId,
+    );
+    await LocationsApiService().reserveLocation(widget.location.id!, resId);
+    changeLoadingState();
+  }
 }
 
 class _Header extends StatelessWidget {
@@ -145,7 +132,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 180,
-      padding: EdgeInsets.only(top: 60, bottom: 40, left: 12, right: 12),
+      padding: const EdgeInsets.only(top: 60, bottom: 40, left: 12, right: 12),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -264,7 +251,7 @@ class _TimeLine extends StatelessWidget {
     DateTime now = DateTime.now();
     Duration duration;
     if (reservationDuration == '30 min') {
-      duration = Duration(minutes: 30);
+      duration = const Duration(minutes: 30);
     } else {
       duration = Duration(hours: int.parse(reservationDuration[0]));
     }
@@ -314,57 +301,6 @@ class _TimeLine extends StatelessWidget {
   }
 }
 
-class _PaymentCard extends StatelessWidget {
-  const _PaymentCard(
-      {Key? key,
-      this.isSelected = false,
-      this.icon = Icons.wallet_membership,
-      this.text = 'Wallet'})
-      : super(key: key);
-
-  final bool isSelected;
-  final IconData icon;
-  final String text;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color(0xFFF0F4F7),
-        gradient: isSelected
-            ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF73AEF5),
-                  Color(0xFF61A4F1),
-                  Color(0xFF478DE0),
-                  Color(0xFF398AE5),
-                ],
-                stops: [0.1, 0.4, 0.7, 0.9],
-              )
-            : null,
-      ),
-      alignment: Alignment.center,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.black,
-          ),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
-          )
-        ],
-      ),
-    );
-  }
-}
-
 class _ConfirmButton extends StatelessWidget {
   const _ConfirmButton({Key? key, this.showLoading = false, this.onPressed})
       : super(key: key);
@@ -395,3 +331,54 @@ class _ConfirmButton extends StatelessWidget {
     );
   }
 }
+
+// class _PaymentCard extends StatelessWidget {
+//   const _PaymentCard(
+//       {Key? key,
+//       this.isSelected = false,
+//       this.icon = Icons.wallet_membership,
+//       this.text = 'Wallet'})
+//       : super(key: key);
+
+//   final bool isSelected;
+//   final IconData icon;
+//   final String text;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       height: 100,
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(10),
+//         color: const Color(0xFFF0F4F7),
+//         gradient: isSelected
+//             ? const LinearGradient(
+//                 begin: Alignment.topCenter,
+//                 end: Alignment.bottomCenter,
+//                 colors: [
+//                   Color(0xFF73AEF5),
+//                   Color(0xFF61A4F1),
+//                   Color(0xFF478DE0),
+//                   Color(0xFF398AE5),
+//                 ],
+//                 stops: [0.1, 0.4, 0.7, 0.9],
+//               )
+//             : null,
+//       ),
+//       alignment: Alignment.center,
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Icon(
+//             icon,
+//             color: isSelected ? Colors.white : Colors.black,
+//           ),
+//           const SizedBox(width: 10),
+//           Text(
+//             text,
+//             style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }

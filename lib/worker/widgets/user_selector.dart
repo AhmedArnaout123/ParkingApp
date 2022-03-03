@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/user.dart';
+import 'package:parking_graduation_app_1/core/models/user.dart';
 
 class UserSelector extends StatefulWidget {
   final void Function(User) onUserSelect;

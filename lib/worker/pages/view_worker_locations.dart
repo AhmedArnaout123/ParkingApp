@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
+import 'package:parking_graduation_app_1/core/Providers/reservations_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/worker_locations_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
@@ -15,13 +17,9 @@ class ViewWorkerLocations extends StatefulWidget {
 }
 
 class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
-  final _locationsApiService = LocationsApiService();
-  final _reservationsApiService = ReservationsApiService();
-
   @override
   void initState() {
     super.initState();
-    //getLocations();
   }
 
   @override
@@ -29,39 +27,35 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
     return SafeArea(
       child: Directionality(
         textDirection: TextDirection.rtl,
-        child: RefreshIndicator(
-          onRefresh: () async => () {}, // getLocations(),
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text('المواقع'),
-            ),
-            drawer: const WorkerDrawer(),
-            body: ListView(
-              children: [
-                StreamBuilder<List<Location>>(
-                  stream: _locationsApiService
-                      .getWorkerLocations('g4tA3hW2h2Bl5NLRTJG8'),
-                  builder: (context, snap) {
-                    if (snap.hasData) {
-                      List<Location> locations = snap.data!;
-                      return Column(
-                        children: locations
-                            .map(
-                              (location) => _LocationCard(
-                                location: location,
-                                onTraillingTap: (location.isReserved())
-                                    ? () => releasLocation(location.id)
-                                    : () => reserveLocation(location),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    }
-                    return Container();
-                  },
-                )
-              ],
-            ),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('المواقع'),
+          ),
+          drawer: const WorkerDrawer(),
+          body: ListView(
+            children: [
+              StreamBuilder<List<Location>>(
+                stream: WorkerLocationsProvider().stream,
+                builder: (context, snap) {
+                  if (snap.hasData) {
+                    List<Location> locations = snap.data!;
+                    return Column(
+                      children: locations
+                          .map(
+                            (location) => _LocationCard(
+                              location: location,
+                              onTraillingTap: (location.isReserved())
+                                  ? () => releasLocation(location)
+                                  : () => reserveLocation(location),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  }
+                  return Container();
+                },
+              )
+            ],
           ),
         ),
       ),
@@ -73,14 +67,15 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
         .push(MaterialPageRoute(builder: (_) => AddReservation(location)));
   }
 
-  void releasLocation(String? id) async {
+  void releasLocation(Location location) async {
     var isSure = await UiHelper.showConfirmationDialog(
         context, 'هل أنت متأكد من الغاء الحجز');
 
     if (!isSure) return;
 
-    await _reservationsApiService.finishLocationReservation(id);
-    await _locationsApiService.releaseLocation(id);
+    await ReservationsApiService()
+        .finishReservation(location.currentReservationId);
+    await LocationsApiService().releaseLocation(location.id);
   }
 }
 
@@ -143,29 +138,27 @@ class LocationReservationInfo extends StatelessWidget {
       : super(key: key);
 
   final Location location;
-  //final Reservation locationReservation;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Reservation>(
-      future:
-          ReservationsApiService().getCurrentLocationReservation(location.id),
+    return StreamBuilder<List<Reservation>>(
+      stream: ReservationProvider().stream,
       builder: (context1, snapshot1) {
         if (snapshot1.hasData) {
-          var reservation = snapshot1.data;
+          var reservation = snapshot1.data!
+              .where((r) => r.id == location.currentReservationId)
+              .single;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                reservation!.endDate!
-                    .substring(reservation.endDate!.length - 5),
+                reservation.endDate!.substring(reservation.endDate!.length - 5),
               ),
               Text(reservation.userFullName!),
               Text(reservation.userPhoneNumber!)
             ],
           );
-          ;
         }
         return Container();
       },

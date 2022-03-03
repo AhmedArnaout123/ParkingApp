@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/models/application_users/user.dart';
-import 'package:parking_graduation_app_1/core/services/application_users_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/current_application_user_service.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/users_provider.dart';
+import 'package:parking_graduation_app_1/core/models/user.dart';
 import 'package:parking_graduation_app_1/core/services/payments_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
 
 class AddPayment extends StatefulWidget {
   const AddPayment({Key? key}) : super(key: key);
@@ -17,17 +18,13 @@ class _AddPaymentState extends State<AddPayment> {
 
   bool isExternalCustomer = false;
   var isLoading = false;
-  List<User> users = [];
 
-  var paymentsApiService = PaymentsApiService();
-  var currentUserApplicationService = CurrentApplicationUserService();
   User? selectedUser;
 
   @override
   void initState() {
     super.initState();
     initializeForm();
-    getUsers();
   }
 
   @override
@@ -57,25 +54,31 @@ class _AddPaymentState extends State<AddPayment> {
                   const Text('المستخدم:', style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: DropdownButtonFormField<User>(
-                      onChanged: isExternalCustomer
-                          ? null
-                          : (user) {
-                              selectedUser = user;
-                              form['userFullName'] = user?.name;
-                              form['userId'] = user?.id;
-                            },
-                      items: [
-                        for (var user in users)
-                          DropdownMenuItem(
-                            child: Text(
-                              '${user.name} - ${user.userName}',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            value: user,
-                          ),
-                      ],
-                    ),
+                    child: StreamBuilder<List<User>>(
+                        stream: UsersProvider().stream,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return Container();
+                          var users = snapshot.data;
+                          return DropdownButtonFormField<User>(
+                            onChanged: isExternalCustomer
+                                ? null
+                                : (user) {
+                                    selectedUser = user;
+                                    form['userFullName'] = user?.name;
+                                    form['userId'] = user?.id;
+                                  },
+                            items: [
+                              for (var user in users!)
+                                DropdownMenuItem(
+                                  child: Text(
+                                    '${user.name} - ${user.userName}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  value: user,
+                                ),
+                            ],
+                          );
+                        }),
                   )
                 ],
               ),
@@ -114,8 +117,8 @@ class _AddPaymentState extends State<AddPayment> {
     });
   }
 
-  void initializeForm() async {
-    var worker = await currentUserApplicationService.getCurrentWorker();
+  void initializeForm() {
+    var worker = CurrentUserProvider().user;
     form = {
       'amount': 0.0,
       'workerId': worker.id,
@@ -124,14 +127,15 @@ class _AddPaymentState extends State<AddPayment> {
     };
   }
 
-  void getUsers() async {
-    users = await ApplicationUsersApiService().getUsers();
-    setState(() {});
-  }
-
   void addPayment() async {
     changeLoadingState();
-    paymentsApiService.addPayment(form);
+
+    PaymentsApiService().addPayment(form);
+
+    if (form['userId'] != null) {
+      await UsersApiService().addToBalance(form['userId'], form['amount']);
+    }
+
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,
