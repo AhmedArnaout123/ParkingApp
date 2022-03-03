@@ -2,30 +2,36 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 
 class LocationsApiService {
   final _collection = FirebaseFirestore.instance.collection('locations');
 
-  Future<List<Location>> getLocations() async {
-    List<Location> locations = [];
-    await _collection.get().then((query) {
-      for (var doc in query.docs) {
+  Stream<List<Location>> getLocationsStream() {
+    var streamController = StreamController<List<Location>>();
+
+    _collection.snapshots().listen((event) {
+      var locations = event.docs.map((doc) {
         var map = {
           'id': doc.id,
           ...doc.data(),
         };
-        locations.add(Location.fromMap(map));
-      }
-    });
+        return Location.fromMap(map);
+      }).toList();
 
-    return locations;
+      streamController.add(locations);
+    });
+    return streamController.stream;
   }
 
-  Stream<List<Location>> getWorkerLocations(String workerId) {
+  Stream<List<Location>> getWorkerLocationsStream() {
     var streamController = StreamController<List<Location>>();
 
-    _collection.snapshots().listen((event) {
+    _collection
+        .where('id', isEqualTo: CurrentWorkerProvider().worker.id)
+        .snapshots()
+        .listen((event) {
       var locations = event.docs.map((doc) {
         var map = {
           'id': doc.id,

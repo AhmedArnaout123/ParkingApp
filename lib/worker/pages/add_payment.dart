@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
-import 'package:parking_graduation_app_1/core/Providers/users_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/models/user.dart';
 import 'package:parking_graduation_app_1/core/services/payments_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
@@ -55,30 +54,32 @@ class _AddPaymentState extends State<AddPayment> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: StreamBuilder<List<User>>(
-                        stream: UsersProvider().stream,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) return Container();
-                          var users = snapshot.data;
-                          return DropdownButtonFormField<User>(
-                            onChanged: isExternalCustomer
-                                ? null
-                                : (user) {
-                                    selectedUser = user;
-                                    form['userFullName'] = user?.name;
-                                    form['userId'] = user?.id;
-                                  },
-                            items: [
-                              for (var user in users!)
-                                DropdownMenuItem(
-                                  child: Text(
-                                    '${user.name} - ${user.userName}',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  value: user,
+                      stream: UsersApiService().getUsersStream(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return Container();
+                        var users = snapshot.data;
+                        print('build: $users');
+                        return DropdownButtonFormField<User>(
+                          onChanged: isExternalCustomer
+                              ? null
+                              : (user) {
+                                  selectedUser = user;
+                                  form['userFullName'] = user?.name;
+                                  form['userId'] = user?.id;
+                                },
+                          items: [
+                            for (var user in users!)
+                              DropdownMenuItem(
+                                child: Text(
+                                  '${user.name} - ${user.userName}',
+                                  style: const TextStyle(fontSize: 12),
                                 ),
-                            ],
-                          );
-                        }),
+                                value: user,
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   )
                 ],
               ),
@@ -118,7 +119,7 @@ class _AddPaymentState extends State<AddPayment> {
   }
 
   void initializeForm() {
-    var worker = CurrentUserProvider().user;
+    var worker = CurrentWorkerProvider().worker;
     form = {
       'amount': 0.0,
       'workerId': worker.id,

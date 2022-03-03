@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/Providers/reservations_provider.dart';
-import 'package:parking_graduation_app_1/core/Providers/worker_locations_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
@@ -35,24 +33,25 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
           body: ListView(
             children: [
               StreamBuilder<List<Location>>(
-                stream: WorkerLocationsProvider().stream,
+                stream: LocationsApiService().getLocationsStream(),
                 builder: (context, snap) {
-                  if (snap.hasData) {
-                    List<Location> locations = snap.data!;
-                    return Column(
-                      children: locations
-                          .map(
-                            (location) => _LocationCard(
-                              location: location,
-                              onTraillingTap: (location.isReserved())
-                                  ? () => releasLocation(location)
-                                  : () => reserveLocation(location),
-                            ),
-                          )
-                          .toList(),
-                    );
+                  if (!snap.hasData) {
+                    return Container();
                   }
-                  return Container();
+                  List<Location> locations = snap.data!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var location in locations)
+                        _LocationCard(
+                          location: location,
+                          onTraillingTap: (location.isReserved())
+                              ? () => releasLocation(location)
+                              : () => reserveLocation(location),
+                        ),
+                    ],
+                  );
                 },
               )
             ],
@@ -142,7 +141,7 @@ class LocationReservationInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Reservation>>(
-      stream: ReservationProvider().stream,
+      stream: ReservationsApiService().getReservationsStream(),
       builder: (context1, snapshot1) {
         if (snapshot1.hasData) {
           var reservation = snapshot1.data!

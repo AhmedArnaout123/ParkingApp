@@ -6,6 +6,7 @@ import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/workers_api_service.dart';
 
 class BookingPage extends StatefulWidget {
   const BookingPage({Key? key, required this.location}) : super(key: key);
@@ -85,12 +86,12 @@ class _BookingPageState extends State<BookingPage> {
     var user = CurrentUserProvider().user;
     var startDate = DateTime.now();
     var endDate = startDate.add(const Duration(hours: 1));
-
-    var worker = await UsersApiService().getWorker(widget.location.workerId);
+    var locationWorker =
+        await WorkersApiService().getWorker(widget.location.workerId!);
 
     form = {
-      'workerId': worker.id,
-      'workerName': worker.name,
+      'workerId': locationWorker.id,
+      'workerName': locationWorker.name,
       'locationId': widget.location.id,
       'locationName': widget.location.name,
       'startDate': startDate.toString().substring(0, 16),

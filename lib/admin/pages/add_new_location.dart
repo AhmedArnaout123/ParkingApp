@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/Providers/workers_proivder.dart';
 import 'package:parking_graduation_app_1/core/models/admin.dart';
 import 'package:parking_graduation_app_1/core/models/worker.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/workers_api_service.dart';
 
 class AddNewLocation extends StatefulWidget {
   const AddNewLocation({Key? key}) : super(key: key);
@@ -72,7 +72,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
               ),
               const SizedBox(height: 30),
               StreamBuilder<List<Worker>>(
-                stream: WorkersProvider().stream,
+                stream: WorkersApiService().getWorkersStream(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Container();

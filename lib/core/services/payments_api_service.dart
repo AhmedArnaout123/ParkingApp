@@ -1,8 +1,50 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/models/payment.dart';
 
 class PaymentsApiService {
   final _collection = FirebaseFirestore.instance.collection('payments');
+
+  Stream<List<Payment>> getPaymentsStream() {
+    var streamController = StreamController<List<Payment>>();
+
+    _collection.snapshots().listen((event) {
+      List<Payment> payments = [];
+
+      for (var payment in event.docs) {
+        payments.add(Payment.fromMap({
+          'id': payment.id,
+          ...payment.data(),
+        }));
+      }
+      streamController.add(payments);
+    });
+
+    return streamController.stream;
+  }
+
+  Stream<List<Payment>> getWorkerPaymentsStream() {
+    var streamController = StreamController<List<Payment>>();
+
+    _collection
+        .where('id', isEqualTo: CurrentWorkerProvider().worker.id)
+        .snapshots()
+        .listen((event) {
+      List<Payment> payments = [];
+
+      for (var payment in event.docs) {
+        payments.add(Payment.fromMap({
+          'id': payment.id,
+          ...payment.data(),
+        }));
+      }
+      streamController.add(payments);
+    });
+
+    return streamController.stream;
+  }
 
   Future<List<Payment>> getPayments() async {
     List<Payment> payments = [];

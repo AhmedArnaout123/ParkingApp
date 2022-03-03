@@ -1,16 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
-import 'package:parking_graduation_app_1/core/Providers/worker_locations_provider.dart';
-import 'package:parking_graduation_app_1/core/Providers/worker_payments_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
+import 'package:parking_graduation_app_1/core/models/user.dart';
 import 'package:parking_graduation_app_1/core/models/worker.dart';
 import 'package:parking_graduation_app_1/users/home_page.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
-
-import 'core/models/admin.dart';
-import 'core/models/user.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,11 +47,8 @@ class _AppInitializerState extends State<AppInitializer> {
     super.initState();
     Firebase.initializeApp()
         .then((_) async {
-          var role = await StorageService().read('role');
-          var id = await StorageService().read('id');
-          WorkerPaymentsProvider.initialize('g4tA3hW2h2Bl5NLRTJG8');
-          WorkerLocationsProvider.initialize('g4tA3hW2h2Bl5NLRTJG8');
-          CurrentUserProvider.initialize('fUjA9g7Lbyr46F6Equ1F');
+          CurrentWorkerProvider.initialize('UK706Ke3hqcS7vaIt7A0');
+          CurrentUserProvider.initialize('qTD15op2mHFMMA3SnlRE');
         })
         .then((_) => {
               setState(() {
@@ -97,6 +92,30 @@ class _AppInitializerState extends State<AppInitializer> {
                     .push(MaterialPageRoute(builder: (_) => const HomePage()));
               },
             ),
+            // ElevatedButton(
+            //   child: const Text('Add Dummy Users'),
+            //   onPressed: () async {
+            //     var user1 = User()
+            //       ..balance = 100.0
+            //       ..name = 'محمد محمود'
+            //       ..phoneNumber = '0965434340'
+            //       ..userName = 'xxx';
+
+            //     var worker1 = Worker()
+            //       ..name = 'islam'
+            //       ..phoneNumber = '0322343'
+            //       ..salary = 10
+            //       ..userName = 'islamx';
+
+            //     await FirebaseFirestore.instance
+            //         .collection('users')
+            //         .add(user1.toMap());
+
+            //     await FirebaseFirestore.instance
+            //         .collection('workers')
+            //         .add(worker1.toMap());
+            //   },
+            // ),
           ],
         ),
       );

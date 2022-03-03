@@ -16,7 +16,6 @@ class _AddNewUserState extends State<AddNewUser> {
   Map<String, String?> form = {
     "name": "",
     "password": "",
-    "role": "",
     "phoneNumber": "",
   };
 

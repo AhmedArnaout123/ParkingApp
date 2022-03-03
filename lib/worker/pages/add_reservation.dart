@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
+import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
@@ -132,7 +132,7 @@ class _AddReservationState extends State<AddReservation> {
   }
 
   void initializeForm() async {
-    var worker = CurrentUserProvider().user;
+    var worker = CurrentWorkerProvider().worker;
     var startDate = DateTime.now();
     var endDate = startDate.add(const Duration(hours: 1));
 

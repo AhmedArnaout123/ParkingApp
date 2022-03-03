@@ -22,7 +22,6 @@ class _ViewLocationsState extends State<ViewLocations> {
   @override
   void initState() {
     super.initState();
-    getLocations();
   }
 
   @override
@@ -30,59 +29,64 @@ class _ViewLocationsState extends State<ViewLocations> {
     return SafeArea(
       child: Directionality(
         textDirection: TextDirection.rtl,
-        child: RefreshIndicator(
-          onRefresh: () async => getLocations(),
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text('المواقع'),
-            ),
-            drawer: const AdminDrawer(),
-            body: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: onAddPress,
-                      child: const Text(
-                        'موقع جديد +',
-                        style: TextStyle(fontSize: 16),
-                      ),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('المواقع'),
+          ),
+          drawer: const AdminDrawer(),
+          body: ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: onAddPress,
+                    child: const Text(
+                      'موقع جديد +',
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
-                for (var location in locations)
-                  _LocationCard(
-                    location: location,
-                    onDelete: () => deleteLocation(location.id),
-                    onTap: () => onTap(location),
-                  )
-              ],
-            ),
+              ),
+              StreamBuilder<List<Location>>(
+                stream: LocationsApiService().getLocationsStream(),
+                builder: (context, snap) {
+                  if (!snap.hasData) {
+                    return Container();
+                  }
+                  List<Location> locations = snap.data!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var location in locations)
+                        _LocationCard(
+                          location: location,
+                          onDelete: () => deleteLocation(location.id),
+                          onTap: () => onTap(location),
+                        )
+                    ],
+                  );
+                },
+              )
+            ],
           ),
         ),
       ),
     );
   }
 
-  void getLocations() async {
-    locations = await _locationsApiService.getLocations();
-    setState(() {});
-  }
-
   void onAddPress() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const AddNewLocation()),
     );
-    getLocations();
   }
 
   void onTap(Location location) async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => UpdateLocation(location)),
     );
-    getLocations();
   }
 
   void deleteLocation(id) async {

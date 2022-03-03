@@ -3,8 +3,6 @@ class User {
 
   String? phoneNumber;
 
-  String? role;
-
   String? name;
 
   double? balance;
@@ -18,7 +16,6 @@ class User {
 
     user.id = map['id'];
     user.phoneNumber = map['phoneNumber'];
-    user.role = map['role'];
     user.name = map['name'];
     user.balance = map['balance'] + 0.0;
     user.userName = map['userName'];
@@ -31,9 +28,8 @@ class User {
 
     map['id'] = id;
     map['phoneNumber'] = phoneNumber;
-    map['role'] = role;
     map['name'] = name;
-    map['balance'] = name;
+    map['balance'] = balance;
     map['userName'] = userName;
     map['currentReservationId'] = currentReservationId;
     return map;
