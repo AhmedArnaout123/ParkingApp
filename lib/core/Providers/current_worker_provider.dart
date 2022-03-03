@@ -5,43 +5,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/worker.dart';
 
 class CurrentWorkerProvider {
-  static CurrentWorkerProvider? _instance;
+  static final CurrentWorkerProvider _instance =
+      CurrentWorkerProvider._internal();
 
-  final StreamController<Worker> _workerStreamController = StreamController();
+  static StreamSubscription<DocumentSnapshot>? _subscription;
 
-  Worker _worker = Worker();
-
-  factory CurrentWorkerProvider.initialize(String id) {
-    if (id == null) {
-      throw Exception('Worker Id is Null');
-    }
-    _instance = CurrentWorkerProvider._internal(id);
-
-    return _instance!;
-  }
-
-  CurrentWorkerProvider._internal(String id) {
-    final _collection = FirebaseFirestore.instance.collection('workers');
-
-    _collection.doc(id).snapshots().listen((event) {
-      var worker = Worker.fromMap({'id': id, ...event.data()!});
-      _worker = worker;
-      _workerStreamController.add(worker);
-    });
-  }
+  static late Worker _worker;
 
   factory CurrentWorkerProvider() {
-    if (_instance == null) {
-      throw Exception('Invoked Worker Provider Before Initialization');
-    }
-    return _instance!;
+    return _instance;
   }
 
-  Stream<Worker> get stream => _instance == null
-      ? throw Exception('Invoked Worker Provider Before Initialization')
-      : _workerStreamController.stream;
+  factory CurrentWorkerProvider.initialize(String id) {
+    if (_subscription != null) {
+      _subscription?.cancel();
+    }
 
-  Worker get worker => _instance == null
-      ? throw Exception('Invoked Worker Provider Before Initialization')
-      : Worker.fromMap(_worker.toMap());
+    _subscription = FirebaseFirestore.instance
+        .collection('workers')
+        .doc(id)
+        .snapshots()
+        .listen(
+      (event) {
+        _worker = Worker.fromMap(
+          {
+            'id': id,
+            ...event.data()!,
+          },
+        );
+        print(_worker.toMap());
+      },
+    );
+
+    return _instance;
+  }
+
+  CurrentWorkerProvider._internal();
+
+  Worker get worker => Worker.fromMap(_worker.toMap());
 }

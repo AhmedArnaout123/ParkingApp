@@ -5,43 +5,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/admin.dart';
 
 class CurrentAdminProvider {
-  static CurrentAdminProvider? _instance;
+  static final CurrentAdminProvider _instance =
+      CurrentAdminProvider._internal();
 
-  final StreamController<Admin> _adminStreamController = StreamController();
+  static StreamSubscription<DocumentSnapshot>? _subscription;
 
-  Admin _admin = Admin();
-
-  factory CurrentAdminProvider.initialize(String id) {
-    if (id == null) {
-      throw Exception('Admin Id is Null');
-    }
-    _instance = CurrentAdminProvider._internal(id);
-
-    return _instance!;
-  }
-
-  CurrentAdminProvider._internal(String id) {
-    final _collection = FirebaseFirestore.instance.collection('admins');
-
-    _collection.doc(id).snapshots().listen((event) {
-      var admin = Admin.fromMap({'id': id, ...event.data()!});
-      _admin = admin;
-      _adminStreamController.add(admin);
-    });
-  }
+  static late Admin _admin;
 
   factory CurrentAdminProvider() {
-    if (_instance == null) {
-      throw Exception('Invoked Admin Provider Before Initialization');
-    }
-    return _instance!;
+    return _instance;
   }
 
-  Stream<Admin> get stream => _instance == null
-      ? throw Exception('Invoked Admin Provider Before Initialization')
-      : _adminStreamController.stream;
+  factory CurrentAdminProvider.initialize(String id) {
+    if (_subscription != null) {
+      _subscription?.cancel();
+    }
 
-  Admin get admin => _instance == null
-      ? throw Exception('Invoked Admin Provider Before Initialization')
-      : Admin.fromMap(_admin.toMap());
+    _subscription = FirebaseFirestore.instance
+        .collection('admins')
+        .doc(id)
+        .snapshots()
+        .listen(
+      (event) {
+        _admin = Admin.fromMap(
+          {
+            'id': id,
+            ...event.data()!,
+          },
+        );
+        print(_admin.toMap());
+      },
+    );
+
+    return _instance;
+  }
+
+  CurrentAdminProvider._internal();
+
+  Admin get admin => Admin.fromMap(_admin.toMap());
 }

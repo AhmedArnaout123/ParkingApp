@@ -27,9 +27,8 @@ class LocationsApiService {
 
   Stream<List<Location>> getWorkerLocationsStream() {
     var streamController = StreamController<List<Location>>();
-
     _collection
-        .where('id', isEqualTo: CurrentWorkerProvider().worker.id)
+        .where('workerId', isEqualTo: CurrentWorkerProvider().worker.id)
         .snapshots()
         .listen((event) {
       var locations = event.docs.map((doc) {

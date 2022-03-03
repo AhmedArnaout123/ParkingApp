@@ -58,25 +58,25 @@ class _AddPaymentState extends State<AddPayment> {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) return Container();
                         var users = snapshot.data;
-                        print('build: $users');
+                        selectedUser = users![0];
                         return DropdownButtonFormField<User>(
+                          value: selectedUser,
                           onChanged: isExternalCustomer
                               ? null
                               : (user) {
                                   selectedUser = user;
-                                  form['userFullName'] = user?.name;
-                                  form['userId'] = user?.id;
                                 },
-                          items: [
-                            for (var user in users!)
-                              DropdownMenuItem(
-                                child: Text(
-                                  '${user.name} - ${user.userName}',
-                                  style: const TextStyle(fontSize: 12),
+                          items: users
+                              .map(
+                                (user) => DropdownMenuItem(
+                                  child: Text(
+                                    '${user.name} - ${user.userName}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  value: user,
                                 ),
-                                value: user,
-                              ),
-                          ],
+                              )
+                              .toList(),
                         );
                       },
                     ),
@@ -90,13 +90,6 @@ class _AddPaymentState extends State<AddPayment> {
                 onChanged: (value) {
                   setState(() {
                     isExternalCustomer = !isExternalCustomer;
-                    if (isExternalCustomer) {
-                      form['userFullName'] = 'زبون خارجي';
-                      form['userId'] = null;
-                    } else {
-                      form['userFullName'] = selectedUser?.name;
-                      form['userId'] = selectedUser?.id;
-                    }
                   });
                 },
               ),
@@ -130,10 +123,12 @@ class _AddPaymentState extends State<AddPayment> {
 
   void addPayment() async {
     changeLoadingState();
-
+    form['userId'] = isExternalCustomer ? null : selectedUser!.id;
+    form['userFullName'] =
+        isExternalCustomer ? 'زبون خارجي' : selectedUser!.name;
     PaymentsApiService().addPayment(form);
 
-    if (form['userId'] != null) {
+    if (!isExternalCustomer) {
       await UsersApiService().addToBalance(form['userId'], form['amount']);
     }
 

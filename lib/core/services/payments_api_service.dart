@@ -29,7 +29,7 @@ class PaymentsApiService {
     var streamController = StreamController<List<Payment>>();
 
     _collection
-        .where('id', isEqualTo: CurrentWorkerProvider().worker.id)
+        .where('workerId', isEqualTo: CurrentWorkerProvider().worker.id)
         .snapshots()
         .listen((event) {
       List<Payment> payments = [];

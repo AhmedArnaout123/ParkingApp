@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:parking_graduation_app_1/core/models/worker.dart';
 
-class WorkerApiService {
+class WorkersApiService {
   final _collection = FirebaseFirestore.instance.collection('workers');
 
   Stream<List<Worker>> getWorkersStream() {

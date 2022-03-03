@@ -84,8 +84,6 @@ class _BookingPageState extends State<BookingPage> {
 
   void initializeForm() async {
     var user = CurrentUserProvider().user;
-    var startDate = DateTime.now();
-    var endDate = startDate.add(const Duration(hours: 1));
     var locationWorker =
         await WorkersApiService().getWorker(widget.location.workerId!);
 
@@ -94,13 +92,10 @@ class _BookingPageState extends State<BookingPage> {
       'workerName': locationWorker.name,
       'locationId': widget.location.id,
       'locationName': widget.location.name,
-      'startDate': startDate.toString().substring(0, 16),
-      'endDate': endDate.toString().substring(0, 16),
       'isFinished': false,
-      'cost': selectedReservation['price'],
       'userId': user.id,
       'userFullName': user.name,
-      'hours': selectedReservation['hours']
+      'userPhoneNumber': user.phoneNumber,
     };
   }
 
@@ -114,7 +109,16 @@ class _BookingPageState extends State<BookingPage> {
       changeLoadingState();
       return;
     }
-
+    form['cost'] = selectedReservation['price'];
+    form['hours'] = selectedReservation['hours'];
+    var startDate = DateTime.now();
+    var endDate = startDate.add(
+      selectedReservation['hours'] == 0.5
+          ? const Duration(minutes: 30)
+          : Duration(hours: selectedReservation['hours']?.toInt() ?? 0),
+    );
+    form['startDate'] = startDate.toString().substring(0, 16);
+    form['endDate'] = endDate.toString().substring(0, 16);
     var resId = await ReservationsApiService().addReservation(form);
     await UsersApiService().makeReservation(
       user.id!,
@@ -323,63 +327,22 @@ class _ConfirmButton extends StatelessWidget {
             ),
           ),
           onPressed: onPressed,
-          child: const Text(
-            'Book Now',
-            style: TextStyle(fontSize: 18),
-          ),
+          child: showLoading
+              ? const Center(
+                  child: SizedBox(
+                    height: 25,
+                    width: 25,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              : const Text(
+                  'Book Now',
+                  style: TextStyle(fontSize: 18),
+                ),
         ),
       ),
     );
   }
 }
-
-// class _PaymentCard extends StatelessWidget {
-//   const _PaymentCard(
-//       {Key? key,
-//       this.isSelected = false,
-//       this.icon = Icons.wallet_membership,
-//       this.text = 'Wallet'})
-//       : super(key: key);
-
-//   final bool isSelected;
-//   final IconData icon;
-//   final String text;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       height: 100,
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(10),
-//         color: const Color(0xFFF0F4F7),
-//         gradient: isSelected
-//             ? const LinearGradient(
-//                 begin: Alignment.topCenter,
-//                 end: Alignment.bottomCenter,
-//                 colors: [
-//                   Color(0xFF73AEF5),
-//                   Color(0xFF61A4F1),
-//                   Color(0xFF478DE0),
-//                   Color(0xFF398AE5),
-//                 ],
-//                 stops: [0.1, 0.4, 0.7, 0.9],
-//               )
-//             : null,
-//       ),
-//       alignment: Alignment.center,
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Icon(
-//             icon,
-//             color: isSelected ? Colors.white : Colors.black,
-//           ),
-//           const SizedBox(width: 10),
-//           Text(
-//             text,
-//             style: TextStyle(color: isSelected ? Colors.white : Colors.black),
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }

@@ -33,7 +33,7 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
           body: ListView(
             children: [
               StreamBuilder<List<Location>>(
-                stream: LocationsApiService().getLocationsStream(),
+                stream: LocationsApiService().getWorkerLocationsStream(),
                 builder: (context, snap) {
                   if (!snap.hasData) {
                     return Container();

@@ -5,43 +5,41 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user.dart';
 
 class CurrentUserProvider {
-  static CurrentUserProvider? _instance;
+  static final CurrentUserProvider _instance = CurrentUserProvider._internal();
 
-  final StreamController<User> _userStreamController = StreamController();
+  static StreamSubscription<DocumentSnapshot>? _subscription;
 
-  User _user = User();
-
-  factory CurrentUserProvider.initialize(String id) {
-    if (id == null) {
-      throw Exception('User Id is Null');
-    }
-    _instance = CurrentUserProvider._internal(id);
-
-    return _instance!;
-  }
-
-  CurrentUserProvider._internal(String id) {
-    final _collection = FirebaseFirestore.instance.collection('users');
-
-    _collection.doc(id).snapshots().listen((event) {
-      var user = User.fromMap({'id': id, ...event.data()!});
-      _user = user;
-      _userStreamController.add(user);
-    });
-  }
+  static late User _user;
 
   factory CurrentUserProvider() {
-    if (_instance == null) {
-      throw Exception('Invoked User Provider Before Initialization');
-    }
-    return _instance!;
+    return _instance;
   }
 
-  Stream<User> get stream => _instance == null
-      ? throw Exception('Invoked User Provider Before Initialization')
-      : _userStreamController.stream;
+  factory CurrentUserProvider.initialize(String id) {
+    if (_subscription != null) {
+      _subscription?.cancel();
+    }
 
-  User get user => _instance == null
-      ? throw Exception('Invoked User Provider Before Initialization')
-      : User.fromMap(_user.toMap());
+    _subscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .snapshots()
+        .listen(
+      (event) {
+        _user = User.fromMap(
+          {
+            'id': id,
+            ...event.data()!,
+          },
+        );
+        print(_user.toMap());
+      },
+    );
+
+    return _instance;
+  }
+
+  CurrentUserProvider._internal();
+
+  User get user => User.fromMap(_user.toMap());
 }
