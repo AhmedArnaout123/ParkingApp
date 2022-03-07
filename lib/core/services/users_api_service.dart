@@ -53,6 +53,18 @@ class UsersApiService {
     });
   }
 
+  Future<void> finishReservation(String? reservationId) async {
+    try {
+      var snapShots = await _collection
+          .where('currentReservationId', isEqualTo: reservationId)
+          .get();
+      var userId = snapShots.docs.single.id;
+      await _collection.doc(userId).update({'currentReservationId': null});
+    } catch (e) {
+      return;
+    }
+  }
+
   Future<void> addToBalance(String userId, double amount) async {
     var user = await getUser(userId);
     user.balance = user.balance! + amount;

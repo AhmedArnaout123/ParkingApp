@@ -9,9 +9,11 @@ import 'package:parking_graduation_app_1/core/services/reservations_api_service.
 import 'package:parking_graduation_app_1/core/services/workers_api_service.dart';
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({Key? key, required this.location}) : super(key: key);
+  const BookingPage({Key? key, required this.location, this.onBookingSuccess})
+      : super(key: key);
 
   final Location location;
+  final onBookingSuccess;
 
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -127,6 +129,10 @@ class _BookingPageState extends State<BookingPage> {
     );
     await LocationsApiService().reserveLocation(widget.location.id!, resId);
     changeLoadingState();
+    if (widget.onBookingSuccess != null) {
+      widget.onBookingSuccess();
+    }
+    Navigator.of(context).pop();
   }
 }
 

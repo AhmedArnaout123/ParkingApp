@@ -4,6 +4,7 @@ import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/add_reservation.dart';
 import 'package:parking_graduation_app_1/worker/widgets/worker_drawer.dart';
 
@@ -75,6 +76,7 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
     await ReservationsApiService()
         .finishReservation(location.currentReservationId);
     await LocationsApiService().releaseLocation(location.id);
+    await UsersApiService().finishReservation(location.currentReservationId);
   }
 }
 
@@ -88,7 +90,7 @@ class _LocationCard extends StatelessWidget {
 
   final Location location;
   final Reservation? locationReservation;
-  final VoidCallback? onTraillingTap;
+  final onTraillingTap;
   @override
   Widget build(BuildContext context) {
     var stateColor = Colors.red;

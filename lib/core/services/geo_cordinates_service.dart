@@ -30,13 +30,15 @@ class GeoCordinatesService {
   Future<double> getDistanceBetween(double startLatitude, double startLongitude,
       double endLatitude, double endLongitude,
       [int fractionDigits = 2]) async {
-    var d = Geolocator.distanceBetween(
+    double distanceInMeters = Geolocator.distanceBetween(
       startLatitude,
       startLongitude,
       endLatitude,
       endLongitude,
     );
-    d = double.parse(d.toStringAsFixed(fractionDigits));
-    return d;
+    double distanceInKiloMeters = distanceInMeters / 1000;
+    double roundDistanceInKM =
+        double.parse((distanceInKiloMeters).toStringAsFixed(2));
+    return roundDistanceInKM;
   }
 }
