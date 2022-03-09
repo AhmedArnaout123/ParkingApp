@@ -31,7 +31,7 @@ class _ViewLocationsState extends State<ViewLocations> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('المواقع'),
+            title: const Text('المواقع'),
           ),
           drawer: const AdminDrawer(),
           body: ListView(

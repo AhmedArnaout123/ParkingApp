@@ -21,7 +21,6 @@ class _ViewReservationState extends State<ViewReservation> {
       for (var doc in event.docs) {
         var data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
         var map = {'id': doc.id, ...data};
-        print(map);
         reservations.add(Reservation.fromMap(map));
       }
       setState(() {});
@@ -29,7 +28,6 @@ class _ViewReservationState extends State<ViewReservation> {
     FirebaseFirestore.instance.collection('reservations').get().then((value) {
       for (var doc in value.docs) {
         var map = {...doc.data(), 'id': doc.id};
-        print(map);
         reservations.add(Reservation.fromMap(map));
       }
       setState(() {});
@@ -42,9 +40,9 @@ class _ViewReservationState extends State<ViewReservation> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('الحجوزات'),
+          title: const Text('الحجوزات'),
         ),
-        drawer: AdminDrawer(),
+        drawer: const AdminDrawer(),
         body: StreamBuilder(
             stream: reservationsStream,
             builder: (context, snapshot) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/users/locations_page.dart';
-import 'package:parking_graduation_app_1/users/profile_page.dart';
+import 'package:parking_graduation_app_1/users/pages/locations_page.dart';
+import 'package:parking_graduation_app_1/users/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

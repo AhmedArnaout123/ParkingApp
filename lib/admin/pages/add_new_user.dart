@@ -32,7 +32,6 @@ class _AddNewUserState extends State<AddNewUser> {
     return usersCollection.add(form).then((value) {
       UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
       changeLoadingState();
-      print('success');
     });
   }
 

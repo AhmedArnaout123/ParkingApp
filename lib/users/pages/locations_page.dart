@@ -5,7 +5,7 @@ import 'package:parking_graduation_app_1/core/Providers/current_user_provider.da
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
 import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/users/booking_page.dart';
+import 'package:parking_graduation_app_1/users/pages/booking_page.dart';
 
 class LocationsPage extends StatefulWidget {
   const LocationsPage({Key? key, this.onBookingSuccess}) : super(key: key);
@@ -168,7 +168,7 @@ class _LocationsPageState extends State<LocationsPage>
           },
         ));
       }
-      if (this.mounted) {
+      if (mounted) {
         setState(() {});
       }
     });

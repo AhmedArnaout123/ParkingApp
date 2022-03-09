@@ -25,7 +25,7 @@ class UsersApiService {
   }
 
   Stream<User> getUserStream(String userId) {
-    var streamController = new StreamController<User>();
+    var streamController = StreamController<User>();
 
     _collection.doc(userId).snapshots().listen((event) {
       streamController.add(User.fromMap({

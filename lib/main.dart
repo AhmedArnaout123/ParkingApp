@@ -1,13 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
-import 'package:parking_graduation_app_1/core/models/user.dart';
-import 'package:parking_graduation_app_1/core/models/worker.dart';
-import 'package:parking_graduation_app_1/users/home_page.dart';
-import 'package:parking_graduation_app_1/core/services/storage_service.dart';
+import 'package:parking_graduation_app_1/users/pages/home_page.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 
 void main() {
@@ -47,20 +43,6 @@ class _AppInitializerState extends State<AppInitializer> {
     super.initState();
     Firebase.initializeApp()
         .then((_) async {
-          var user = User()
-            ..balance = 100.0
-            ..name = 'محمد محمود'
-            ..phoneNumber = '0965434340'
-            ..userName = 'xxx'
-            ..id = 'qTD15op2mHFMMA3SnlRE';
-
-          var worker = Worker()
-            ..name = 'islam'
-            ..phoneNumber = '0322343'
-            ..salary = 10
-            ..userName = 'islamx'
-            ..id = 'UK706Ke3hqcS7vaIt7A0';
-
           CurrentUserProvider.initialize('qTD15op2mHFMMA3SnlRE');
           CurrentWorkerProvider.initialize('UK706Ke3hqcS7vaIt7A0');
         })

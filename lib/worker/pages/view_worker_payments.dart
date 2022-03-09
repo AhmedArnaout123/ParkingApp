@@ -24,7 +24,7 @@ class _ViewWorkerPaymentsState extends State<ViewWorkerPayments> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('الدفعات'),
+            title: const Text('الدفعات'),
           ),
           drawer: const WorkerDrawer(),
           body: ListView(

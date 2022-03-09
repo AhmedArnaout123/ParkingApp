@@ -33,7 +33,6 @@ class CurrentWorkerProvider {
             ...event.data()!,
           },
         );
-        print(_worker.toMap());
       },
     );
 

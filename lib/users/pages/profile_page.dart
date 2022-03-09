@@ -3,13 +3,10 @@ import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/dates_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
-import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/models/user.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
-import 'package:parking_graduation_app_1/users/booking_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -27,7 +24,7 @@ class ProfilePage extends StatelessWidget {
                 'هل أنت متأكد من تسجيل الخروج',
               );
             },
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
           ),
         ),
         body: StreamBuilder<User>(
@@ -48,7 +45,7 @@ class ProfilePage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'الرصيد الحالي' + ' :' + ' ${user.balance.toString()}',
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
@@ -88,7 +85,7 @@ class CurrentReservationWidget extends StatelessWidget {
   CurrentReservationWidget(this.reservationId, {Key? key}) : super(key: key);
 
   final String reservationId;
-  Reservation? reservation;
+  late final Reservation? reservation;
   String getHoursFromDate(String date) {
     return date.substring(date.length - 5, date.length);
   }

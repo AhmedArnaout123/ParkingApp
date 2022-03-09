@@ -28,7 +28,7 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('المواقع'),
+            title: const Text('المواقع'),
           ),
           drawer: const WorkerDrawer(),
           body: ListView(

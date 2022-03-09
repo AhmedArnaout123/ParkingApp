@@ -33,7 +33,6 @@ class CurrentAdminProvider {
             ...event.data()!,
           },
         );
-        print(_admin.toMap());
       },
     );
 

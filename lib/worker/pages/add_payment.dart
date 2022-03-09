@@ -33,7 +33,7 @@ class _AddPaymentState extends State<AddPayment> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('دفعة جديدة'),
+            title: const Text('دفعة جديدة'),
           ),
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -86,7 +86,7 @@ class _AddPaymentState extends State<AddPayment> {
               const SizedBox(height: 15),
               CheckboxListTile(
                 value: isExternalCustomer,
-                title: Text('زبون خارجي'),
+                title: const Text('زبون خارجي'),
                 onChanged: (value) {
                   setState(() {
                     isExternalCustomer = !isExternalCustomer;

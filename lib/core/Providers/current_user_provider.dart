@@ -32,7 +32,6 @@ class CurrentUserProvider {
             ...event.data()!,
           },
         );
-        print(_user.toMap());
       },
     );
 

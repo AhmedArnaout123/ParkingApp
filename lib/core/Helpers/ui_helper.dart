@@ -11,7 +11,7 @@ class UiHelper {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('حسناً'),
+                child: const Text('حسناً'),
               )
             ],
           );
@@ -45,13 +45,13 @@ class UiHelper {
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
-                child: Text('نعم'),
+                child: const Text('نعم'),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
-                child: Text('لا'),
+                child: const Text('لا'),
               ),
             ],
           ),

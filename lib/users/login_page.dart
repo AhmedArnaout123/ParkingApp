@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -141,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           primary: Colors.white,
         ),
-        onPressed: () => print('Login Button Pressed'),
+        onPressed: () => {},
         child: const Text(
           'LOGIN',
           style: TextStyle(
