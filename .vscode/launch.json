@@ -13,7 +13,7 @@
             "name": "parking_graduation_app_1 (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "debug"
         }
     ]
 }

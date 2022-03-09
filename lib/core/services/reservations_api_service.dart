@@ -24,6 +24,19 @@ class ReservationsApiService {
     return streamController.stream;
   }
 
+  Stream<Reservation> getReservationStream(String? id) {
+    var streamController = StreamController<Reservation>();
+
+    _collection.doc(id).snapshots().listen((event) {
+      streamController.add(Reservation.fromMap({
+        'id': event.id,
+        ...event.data()!,
+      }));
+    });
+
+    return streamController.stream;
+  }
+
   Future<String> addReservation(Map<String, dynamic> data) async {
     String id = "";
     await _collection.add(data).then((doc) => id = doc.id);
@@ -34,6 +47,14 @@ class ReservationsApiService {
     _collection.doc(reservationId).update({
       'endDate': DateTime.now().toString().substring(0, 16),
       'isFinished': true
+    });
+  }
+
+  Future<void> extendReservation(
+      String? reservationId, String newDate, double newCost) async {
+    await _collection.doc(reservationId).update({
+      'endDate': newDate,
+      'cost': newCost,
     });
   }
 }

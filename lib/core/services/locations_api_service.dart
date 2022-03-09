@@ -44,6 +44,12 @@ class LocationsApiService {
     return streamController.stream;
   }
 
+  Future<void> getLocation(String? id) async {
+    return await _collection.doc(id).get().then((value) => Location.fromMap(
+          ({'id': id, ...value.data()!}),
+        ));
+  }
+
   Future<String> addLocation(Map<String, dynamic> data) async {
     String id = "";
     await _collection.add(data).then((doc) => id == doc.id);

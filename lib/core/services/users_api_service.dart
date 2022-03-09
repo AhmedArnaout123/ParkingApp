@@ -24,6 +24,18 @@ class UsersApiService {
     return streamController.stream;
   }
 
+  Stream<User> getUserStream(String userId) {
+    var streamController = new StreamController<User>();
+
+    _collection.doc(userId).snapshots().listen((event) {
+      streamController.add(User.fromMap({
+        'id': userId,
+        ...event.data()!,
+      }));
+    });
+    return streamController.stream;
+  }
+
   Future<List<User>> getUsers() async {
     List<User> users = [];
 
@@ -68,6 +80,12 @@ class UsersApiService {
   Future<void> addToBalance(String userId, double amount) async {
     var user = await getUser(userId);
     user.balance = user.balance! + amount;
+    await _collection.doc(userId).update({'balance': user.balance});
+  }
+
+  Future<void> subtractFromBalance(String userId, double amount) async {
+    var user = await getUser(userId);
+    user.balance = user.balance! - amount;
     await _collection.doc(userId).update({'balance': user.balance});
   }
 }
