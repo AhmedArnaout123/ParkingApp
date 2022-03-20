@@ -1,7 +1,13 @@
-import 'package:parking_graduation_app_1/core/models/accounts/accounts.dart';
+class User {
+  String? id;
 
-class User extends Account {
+  String? phoneNumber;
+
+  String? name;
+
   double? balance;
+
+  String? userName;
 
   String? currentReservationId;
 
@@ -10,11 +16,10 @@ class User extends Account {
 
     user.id = map['id'];
     user.phoneNumber = map['phoneNumber'];
-    user.userFullName = map['userFullName'];
+    user.name = map['name'];
     user.balance = map['balance'] + 0.0;
     user.userName = map['userName'];
     user.currentReservationId = map['currentReservationId'];
-    user.role = map['role'];
     return user;
   }
 
@@ -23,12 +28,10 @@ class User extends Account {
 
     map['id'] = id;
     map['phoneNumber'] = phoneNumber;
-    map['userFullName'] = userFullName;
+    map['name'] = name;
     map['balance'] = balance;
     map['userName'] = userName;
     map['currentReservationId'] = currentReservationId;
-    map['role'] = role;
-
     return map;
   }
 }
