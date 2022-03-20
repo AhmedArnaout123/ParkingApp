@@ -15,15 +15,6 @@ class ViewLocations extends StatefulWidget {
 }
 
 class _ViewLocationsState extends State<ViewLocations> {
-  List<Location> locations = [];
-
-  final _locationsApiService = LocationsApiService();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -59,14 +50,13 @@ class _ViewLocationsState extends State<ViewLocations> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (var location in locations)
-                        _LocationCard(
-                          location: location,
-                          onDelete: () => deleteLocation(location.id),
-                          onTap: () => onTap(location),
-                        )
-                    ],
+                    children: locations
+                        .map((location) => _LocationCard(
+                              location: location,
+                              onDelete: () => deleteLocation(location.id),
+                              onTap: () => onTap(location),
+                            ))
+                        .toList(),
                   );
                 },
               )
@@ -94,10 +84,7 @@ class _ViewLocationsState extends State<ViewLocations> {
 
     if (!isSure) return;
 
-    await _locationsApiService.deleteLocation(id);
-    setState(() {
-      locations.removeWhere((l) => l.id == id);
-    });
+    await LocationsApiService().deleteLocation(id);
   }
 }
 
@@ -134,8 +121,8 @@ class _LocationCard extends StatelessWidget {
             color: stateColor,
           ),
         ),
-        title: Text(location.name ?? ''),
-        subtitle: Text(location.workerFullName ?? ''),
+        title: Text(location.name!),
+        subtitle: Text(location.workerFullName!),
         trailing: IconButton(
           icon: const Icon(
             Icons.delete,

@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/admin/pages/add_worker_or_admin.dart';
 import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
+import 'package:parking_graduation_app_1/common/pages/login_page.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/users/pages/home_page.dart';
@@ -43,8 +45,8 @@ class _AppInitializerState extends State<AppInitializer> {
     super.initState();
     Firebase.initializeApp()
         .then((_) async {
-          CurrentUserProvider.initialize('qTD15op2mHFMMA3SnlRE');
-          CurrentWorkerProvider.initialize('UK706Ke3hqcS7vaIt7A0');
+          // CurrentUserProvider.initialize('qTD15op2mHFMMA3SnlRE');
+          // CurrentWorkerProvider.initialize('UK706Ke3hqcS7vaIt7A0');
         })
         .then((_) => {
               setState(() {
@@ -53,7 +55,7 @@ class _AppInitializerState extends State<AppInitializer> {
             })
         .catchError((e) {
           setState(() {
-            initializerFailed = true;
+            initializerFailed = false;
           });
         });
   }
@@ -67,8 +69,15 @@ class _AppInitializerState extends State<AppInitializer> {
             ElevatedButton(
               child: const Text('ADMINS'),
               onPressed: () async {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ViewLocations()));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const AddWorkerOrAdmin()));
+              },
+            ),
+            ElevatedButton(
+              child: const Text('login'),
+              onPressed: () async {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const LoginPage()));
               },
             ),
             ElevatedButton(

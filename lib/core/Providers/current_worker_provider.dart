@@ -16,27 +16,30 @@ class CurrentWorkerProvider {
     return _instance;
   }
 
-  factory CurrentWorkerProvider.initialize(String id) {
+  static Future<void> initialize(String id) async {
     if (_subscription != null) {
       _subscription?.cancel();
     }
 
+    var doc =
+        await FirebaseFirestore.instance.collection('accounts').doc(id).get();
+
+    _worker = Worker.fromMap({'id': doc.id, ...doc.data()!});
+
     _subscription = FirebaseFirestore.instance
-        .collection('workers')
+        .collection('accounts')
         .doc(id)
         .snapshots()
         .listen(
-      (event) {
+      (doc) {
         _worker = Worker.fromMap(
           {
             'id': id,
-            ...event.data()!,
+            ...doc.data()!,
           },
         );
       },
     );
-
-    return _instance;
   }
 
   CurrentWorkerProvider._internal();

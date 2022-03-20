@@ -51,7 +51,7 @@ class _AddReservationState extends State<AddReservation> {
                   ),
                   Expanded(
                     child: Text(
-                      widget.location.name ?? '',
+                      widget.location.name!,
                       style: customTextStyle,
                     ),
                   )
@@ -75,7 +75,7 @@ class _AddReservationState extends State<AddReservation> {
                           for (var re in ConstantsHelper.reservationCategories)
                             DropdownMenuItem(
                               child: Text(re['text']),
-                              value: re['hours'] as double,
+                              value: re['hours'],
                             )
                         ],
                       ),
@@ -138,7 +138,7 @@ class _AddReservationState extends State<AddReservation> {
 
     form = {
       'workerId': worker.id,
-      'workerName': worker.name,
+      'workerFullName': worker.fullName,
       'locationId': widget.location.id,
       'locationName': widget.location.name,
       'startDate': startDate.toString().substring(0, 16),
@@ -146,17 +146,14 @@ class _AddReservationState extends State<AddReservation> {
       'isFinished': false,
       'cost': selectedReservation['price'],
       'userId': null,
-      'hours': selectedReservation['hours']
     };
   }
 
   void onTimeSelect(double? hours) {
     selectedReservation = ConstantsHelper.reservationCategories
         .firstWhere((e) => e['hours'] == hours);
-    setState(() {});
 
     form['cost'] = selectedReservation['price'];
-    form['hours'] = hours;
     var startDate = DateTime.now();
     var endDate = startDate.add(
       hours == 0.5
@@ -165,6 +162,8 @@ class _AddReservationState extends State<AddReservation> {
     );
     form['startDate'] = startDate.toString().substring(0, 16);
     form['endDate'] = endDate.toString().substring(0, 16);
+
+    setState(() {});
   }
 
   void addReservation() async {

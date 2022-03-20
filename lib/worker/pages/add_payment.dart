@@ -44,7 +44,7 @@ class _AddPaymentState extends State<AddPayment> {
                   hintText: 'المبلغ',
                 ),
                 onChanged: (value) {
-                  form['amount'] = double.parse(value);
+                  form['amount'] = int.parse(value);
                 },
               ),
               const SizedBox(height: 40),
@@ -53,12 +53,12 @@ class _AddPaymentState extends State<AddPayment> {
                   const Text('المستخدم:', style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: StreamBuilder<List<User>>(
-                      stream: UsersApiService().getUsersStream(),
+                    child: FutureBuilder<List<User>>(
+                      future: UsersApiService().getUsersFuture(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) return Container();
-                        var users = snapshot.data;
-                        selectedUser = users![0];
+                        var users = snapshot.data!;
+                        selectedUser = users[0];
                         return DropdownButtonFormField<User>(
                           value: selectedUser,
                           onChanged: isExternalCustomer
@@ -70,7 +70,7 @@ class _AddPaymentState extends State<AddPayment> {
                               .map(
                                 (user) => DropdownMenuItem(
                                   child: Text(
-                                    '${user.name} - ${user.userName}',
+                                    '${user.fullName} - ${user.userName}',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                   value: user,
@@ -114,18 +114,19 @@ class _AddPaymentState extends State<AddPayment> {
   void initializeForm() {
     var worker = CurrentWorkerProvider().worker;
     form = {
-      'amount': 0.0,
+      'amount': 0,
       'workerId': worker.id,
-      'workerFullName': worker.name,
+      'workerFullName': worker.fullName,
       'date': DateTime.now().toString().substring(0, 16)
     };
   }
 
   void addPayment() async {
     changeLoadingState();
+
     form['userId'] = isExternalCustomer ? null : selectedUser!.id;
     form['userFullName'] =
-        isExternalCustomer ? 'زبون خارجي' : selectedUser!.name;
+        isExternalCustomer ? 'زبون خارجي' : selectedUser!.fullName;
     PaymentsApiService().addPayment(form);
 
     if (!isExternalCustomer) {

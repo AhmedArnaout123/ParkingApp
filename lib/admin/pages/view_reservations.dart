@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
+import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
 
 class ViewReservation extends StatefulWidget {
   const ViewReservation({Key? key}) : super(key: key);
@@ -11,29 +11,6 @@ class ViewReservation extends StatefulWidget {
 }
 
 class _ViewReservationState extends State<ViewReservation> {
-  List<Reservation> reservations = [];
-
-  final Stream<QuerySnapshot> reservationsStream =
-      FirebaseFirestore.instance.collection('reservations').snapshots();
-  void getReservations() {
-    reservationsStream.listen((event) {
-      reservations = [];
-      for (var doc in event.docs) {
-        var data = doc.data() as Map<String, dynamic>? ?? <String, dynamic>{};
-        var map = {'id': doc.id, ...data};
-        reservations.add(Reservation.fromMap(map));
-      }
-      setState(() {});
-    });
-    FirebaseFirestore.instance.collection('reservations').get().then((value) {
-      for (var doc in value.docs) {
-        var map = {...doc.data(), 'id': doc.id};
-        reservations.add(Reservation.fromMap(map));
-      }
-      setState(() {});
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -43,14 +20,16 @@ class _ViewReservationState extends State<ViewReservation> {
           title: const Text('الحجوزات'),
         ),
         drawer: const AdminDrawer(),
-        body: StreamBuilder(
-            stream: reservationsStream,
+        body: StreamBuilder<List<Reservation>>(
+            stream: ReservationsApiService().getReservationsStream(),
             builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Container();
+              }
+              var reservations = snapshot.data!;
               return ListView(
-                children: [
-                  for (var reservation in reservations)
-                    _ReservationCard(reservation)
-                ],
+                children:
+                    reservations.map((res) => _ReservationCard(res)).toList(),
               );
             }),
       ),
@@ -68,34 +47,9 @@ class _ReservationCard extends StatefulWidget {
 }
 
 class _ReservationCardState extends State<_ReservationCard> {
-  String locationName = "", userName = "", phoneNumber = "";
-
-  void getData() {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.reservation.userId)
-        .get()
-        .then((value) {
-      userName = value.data()?['name'];
-      phoneNumber = value.data()?['phoneNumber'];
-      setState(() {});
-    });
-
-    FirebaseFirestore.instance
-        .collection('locations')
-        .doc(widget.reservation.userId)
-        .get()
-        .then((value) {
-      locationName = value.data()?['name'];
-      setState(() {});
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-
-    getData();
   }
 
   @override
@@ -117,13 +71,12 @@ class _ReservationCardState extends State<_ReservationCard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('الموقع:$locationName'),
-          Text('المستخدم:$userName'),
-          Text('رقم الهاتف:$phoneNumber'),
+          Text('الموقع:${widget.reservation.locationName}'),
+          Text('المستخدم:${widget.reservation.userFullName}'),
+          Text('رقم الهاتف:${widget.reservation.userPhoneNumber}'),
           Text('البدء:${widget.reservation.startDate}'),
           Text('الانتهاء:${widget.reservation.endDate}'),
           Text('السعر:${widget.reservation.cost}'),
-          Text('المدة:${widget.reservation.hours}/سا'),
         ],
       ),
     );

@@ -60,8 +60,7 @@ class _BookingPageState extends State<BookingPage> {
                     child: ResravationCard(
                       duration: ConstantsHelper.reservationCategories[i]['text']
                           as String,
-                      price: ConstantsHelper.reservationCategories[i]['price']
-                          as double,
+                      price: ConstantsHelper.reservationCategories[i]['price'],
                       isSelected: selectedReservation ==
                           ConstantsHelper.reservationCategories[i],
                     ),
@@ -91,12 +90,12 @@ class _BookingPageState extends State<BookingPage> {
 
     form = {
       'workerId': locationWorker.id,
-      'workerName': locationWorker.name,
+      'workerFullName': locationWorker.fullName,
       'locationId': widget.location.id,
       'locationName': widget.location.name,
       'isFinished': false,
       'userId': user.id,
-      'userFullName': user.name,
+      'userFullName': user.fullName,
       'userPhoneNumber': user.phoneNumber,
     };
   }
@@ -112,7 +111,6 @@ class _BookingPageState extends State<BookingPage> {
       return;
     }
     form['cost'] = selectedReservation['price'];
-    form['hours'] = selectedReservation['hours'];
     var startDate = DateTime.now();
     var endDate = startDate.add(
       selectedReservation['hours'] == 0.5
@@ -124,7 +122,7 @@ class _BookingPageState extends State<BookingPage> {
     var resId = await ReservationsApiService().addReservation(form);
     await UsersApiService().makeReservation(
       user.id!,
-      user.balance! - selectedReservation['price'],
+      (user.balance! - selectedReservation['price']).toInt(),
       resId,
     );
     await LocationsApiService().reserveLocation(widget.location.id!, resId);
@@ -189,7 +187,7 @@ class _Header extends StatelessWidget {
 class ResravationCard extends StatelessWidget {
   final bool isSelected;
   final String duration;
-  final double price;
+  final int price;
   const ResravationCard(
       {Key? key, this.isSelected = false, this.duration = '', this.price = 0})
       : super(key: key);

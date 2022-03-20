@@ -85,7 +85,6 @@ class CurrentReservationWidget extends StatelessWidget {
   CurrentReservationWidget(this.reservationId, {Key? key}) : super(key: key);
 
   final String reservationId;
-  late final Reservation? reservation;
   String getHoursFromDate(String date) {
     return date.substring(date.length - 5, date.length);
   }
@@ -93,44 +92,47 @@ class CurrentReservationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Reservation>(
-        stream: ReservationsApiService().getReservationStream(reservationId),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          reservation = snapshot.data!;
-          return Container(
-            color: Colors.blue[50],
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: ListTile(
-              title: Text(
-                  '${getHoursFromDate(reservation!.startDate!)} - ${getHoursFromDate(reservation!.endDate!)}'),
-              subtitle: Text(reservation!.locationName!),
-              trailing: TextButton(
-                onPressed: () async {
-                  showReservationExtendingDialog(context);
-                },
-                child: Text(
-                  'تمديد الحجز',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.green[400],
-                    fontWeight: FontWeight.bold,
-                  ),
+      stream: ReservationsApiService().getReservationStream(reservationId),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        var reservation = snapshot.data!;
+        return Container(
+          color: Colors.blue[50],
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            title: Text(
+                '${getHoursFromDate(reservation.startDate!)} - ${getHoursFromDate(reservation.endDate!)}'),
+            subtitle: Text(reservation.locationName!),
+            trailing: TextButton(
+              onPressed: () async {
+                showReservationExtendingDialog(context, reservation);
+              },
+              child: Text(
+                'تمديد الحجز',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.green[400],
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
-  void showReservationExtendingDialog(BuildContext context) {
+  void showReservationExtendingDialog(
+      BuildContext context, Reservation reservation) {
     var selectedReservation = ConstantsHelper.reservationCategories[1];
     var isLoading = false;
     showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setStater) {
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStater) {
             return SizedBox(
               height: 100,
               child: Dialog(
@@ -179,7 +181,7 @@ class CurrentReservationWidget extends StatelessWidget {
                           isLoading = true;
                           setStater(() {});
                           DateTime oldEndDate = DatesHelper.getDateFromString(
-                              reservation!.endDate!);
+                              reservation.endDate!);
                           var newEndDate = oldEndDate.add(
                             selectedReservation['hours'] == 0.5
                                 ? const Duration(minutes: 30)
@@ -190,11 +192,11 @@ class CurrentReservationWidget extends StatelessWidget {
                                   ),
                           );
                           var newCost =
-                              reservation!.cost! + selectedReservation['price'];
+                              reservation.cost! + selectedReservation['price'];
                           await ReservationsApiService().extendReservation(
                             reservationId,
                             newEndDate.toString().substring(0, 16),
-                            newCost,
+                            newCost.toInt(),
                           );
                           await UsersApiService().subtractFromBalance(
                               CurrentUserProvider().user.id!,
@@ -223,7 +225,9 @@ class CurrentReservationWidget extends StatelessWidget {
                 ),
               ),
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 }

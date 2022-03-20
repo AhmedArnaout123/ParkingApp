@@ -3,19 +3,19 @@ import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/services/Api/accounts_api_service.dart';
 
-class AddNewUser extends StatefulWidget {
-  const AddNewUser({Key? key}) : super(key: key);
+class AddWorkerOrAdmin extends StatefulWidget {
+  const AddWorkerOrAdmin({Key? key}) : super(key: key);
 
   @override
-  _AddNewUserState createState() => _AddNewUserState();
+  _AddWorkerOrAdminState createState() => _AddWorkerOrAdminState();
 }
 
-class _AddNewUserState extends State<AddNewUser> {
+class _AddWorkerOrAdminState extends State<AddWorkerOrAdmin> {
   bool isLoading = false;
 
   Map<String, String?> form = {
     "userName": "",
-    "userFullName": "",
+    "fullName": "",
     "password": "",
     "phoneNumber": "",
     "role": ""
@@ -36,9 +36,15 @@ class _AddNewUserState extends State<AddNewUser> {
             children: [
               const SizedBox(height: 40),
               TextFormField(
-                decoration: const InputDecoration(hintText: 'الاسم'),
+                decoration: const InputDecoration(hintText: 'اسم المستخدم'),
                 onChanged: (value) {
-                  form['name'] = value;
+                  form['userName'] = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(hintText: 'الاسم الكامل'),
+                onChanged: (value) {
+                  form['fullName'] = value;
                 },
               ),
               const SizedBox(height: 20),
@@ -92,7 +98,7 @@ class _AddNewUserState extends State<AddNewUser> {
 
   void addUser() async {
     changeLoadingState();
-    await AccountApiService().addAccount(form);
+    await AccountsApiService().addAccount(form);
 
     UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
     changeLoadingState();

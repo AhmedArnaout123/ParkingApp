@@ -82,11 +82,11 @@ class _AddNewLocationState extends State<AddNewLocation> {
                     hint: const Text("العامل المسؤول"),
                     onChanged: (worker) {
                       form['workerId'] = worker!.id;
-                      form['workerFullName'] = worker.name;
+                      form['workerFullName'] = worker.fullName;
                     },
                     items: workers
                         .map((worker) => DropdownMenuItem(
-                              child: Text(worker.name!),
+                              child: Text(worker.fullName!),
                               value: worker,
                             ))
                         .toList(),

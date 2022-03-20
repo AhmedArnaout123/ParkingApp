@@ -15,27 +15,30 @@ class CurrentUserProvider {
     return _instance;
   }
 
-  factory CurrentUserProvider.initialize(String id) {
+  static Future<void> initialize(String id) async {
     if (_subscription != null) {
       _subscription?.cancel();
     }
 
+    var doc =
+        await FirebaseFirestore.instance.collection('accounts').doc(id).get();
+
+    _user = User.fromMap({'id': doc.id, ...doc.data()!});
+    print('user is $_user');
     _subscription = FirebaseFirestore.instance
-        .collection('users')
+        .collection('accounts')
         .doc(id)
         .snapshots()
         .listen(
-      (event) {
+      (doc) {
         _user = User.fromMap(
           {
             'id': id,
-            ...event.data()!,
+            ...doc.data()!,
           },
         );
       },
     );
-
-    return _instance;
   }
 
   CurrentUserProvider._internal();

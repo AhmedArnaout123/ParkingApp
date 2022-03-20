@@ -34,6 +34,7 @@ class _LocationsPageState extends State<LocationsPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

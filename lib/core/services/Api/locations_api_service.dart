@@ -44,12 +44,6 @@ class LocationsApiService {
     return streamController.stream;
   }
 
-  Future<void> getLocation(String? id) async {
-    return await _collection.doc(id).get().then((value) => Location.fromMap(
-          ({'id': id, ...value.data()!}),
-        ));
-  }
-
   Future<String> addLocation(Map<String, dynamic> data) async {
     String id = "";
     await _collection.add(data).then((doc) => id == doc.id);
@@ -66,12 +60,12 @@ class LocationsApiService {
 
   Future<void> reserveLocation(String id, String currentReservationId) async {
     await _collection.doc(id).update({
-      'state': ConstantsHelper.locationStates[2],
+      'state': ConstantsHelper.locationStates[1],
       'currentReservationId': currentReservationId,
     });
   }
 
-  Future<void> releaseLocation(String? id) async {
+  Future<void> releaseLocation(String id) async {
     await _collection.doc(id).update({
       'state': ConstantsHelper.locationStates[0],
       'currentReservationId': null,

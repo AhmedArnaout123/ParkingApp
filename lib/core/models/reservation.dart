@@ -15,13 +15,11 @@ class Reservation {
 
   String? locationName;
 
-  double? hours;
-
   String? startDate;
 
   String? endDate;
 
-  double? cost;
+  int? cost;
 
   bool? isFinished;
 
@@ -39,7 +37,6 @@ class Reservation {
     res.cost = map['cost'];
     res.endDate = map['endDate'];
     res.startDate = map['startDate'];
-    res.hours = map['hours'];
     res.isFinished = map['isFinished'];
 
     return res;
@@ -59,7 +56,6 @@ class Reservation {
     map['cost'] = cost;
     map['endDate'] = endDate;
     map['startDate'] = startDate;
-    map['hours'] = hours;
     map['isFinished'] = isFinished;
     return map;
   }

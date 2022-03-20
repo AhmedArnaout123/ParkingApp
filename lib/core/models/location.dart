@@ -50,7 +50,7 @@ class Location {
   }
 
   bool isReserved() {
-    return state == ConstantsHelper.locationStates[2];
+    return state == ConstantsHelper.locationStates[1];
   }
 
   @override

@@ -1,19 +1,15 @@
-class Admin {
-  String? id;
+import 'package:parking_graduation_app_1/core/models/accounts/accounts.dart';
 
-  String? phoneNumber;
-
-  String? name;
-
-  String? userName;
-
+class Admin extends Account {
   static Admin fromMap(Map<String, dynamic> map) {
     var admin = Admin();
 
     admin.id = map['id'];
     admin.phoneNumber = map['phoneNumber'];
-    admin.name = map['name'];
+    admin.fullName = map['fullName'];
     admin.userName = map['userName'];
+    admin.role = map['role'];
+
     return admin;
   }
 
@@ -22,8 +18,9 @@ class Admin {
 
     map['id'] = id;
     map['phoneNumber'] = phoneNumber;
-    map['name'] = 'name';
+    map['fullName'] = fullName;
     map['userName'] = userName;
+    map['role'] = role;
 
     return map;
   }

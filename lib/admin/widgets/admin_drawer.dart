@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_accounts/user.dart';
+import 'package:parking_graduation_app_1/admin/pages/add_worker_or_admin.dart';
 import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_reservations.dart';
 
@@ -45,7 +45,7 @@ class AdminDrawer extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                          builder: (context) => const AddNewUser())),
+                          builder: (context) => const AddWorkerOrAdmin())),
                   icon: const Icon(Icons.person, color: Colors.black),
                 ),
               ),

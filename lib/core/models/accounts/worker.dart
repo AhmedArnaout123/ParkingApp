@@ -1,22 +1,15 @@
-class Worker {
-  String? id;
+import 'package:parking_graduation_app_1/core/models/accounts/accounts.dart';
 
-  String? phoneNumber;
-
-  String? name;
-
-  String? userName;
-
-  int? salary;
-
+class Worker extends Account {
   static Worker fromMap(Map<String, dynamic> map) {
     var worker = Worker();
 
     worker.id = map['id'];
     worker.phoneNumber = map['phoneNumber'];
-    worker.name = map['name'];
+    worker.fullName = map['fullName'];
     worker.userName = map['userName'];
-    worker.salary = map['salary'];
+    worker.role = map['role'];
+
     return worker;
   }
 
@@ -25,9 +18,9 @@ class Worker {
 
     map['id'] = id;
     map['phoneNumber'] = phoneNumber;
-    map['name'] = 'name';
     map['userName'] = userName;
-    map['salary'] = salary;
+    map['fullName'] = fullName;
+    map['role'] = role;
 
     return map;
   }

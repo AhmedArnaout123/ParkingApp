@@ -22,15 +22,15 @@ class CurrentAdminProvider {
     }
 
     _subscription = FirebaseFirestore.instance
-        .collection('admins')
+        .collection('accounts')
         .doc(id)
         .snapshots()
         .listen(
-      (event) {
+      (doc) {
         _admin = Admin.fromMap(
           {
             'id': id,
-            ...event.data()!,
+            ...doc.data()!,
           },
         );
       },

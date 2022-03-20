@@ -47,9 +47,6 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
                       for (var location in locations)
                         _LocationCard(
                           location: location,
-                          onTraillingTap: (location.isReserved())
-                              ? () => releasLocation(location)
-                              : () => reserveLocation(location),
                         ),
                     ],
                   );
@@ -61,36 +58,15 @@ class _ViewWorkerLocationsState extends State<ViewWorkerLocations> {
       ),
     );
   }
-
-  void reserveLocation(Location location) async {
-    await Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => AddReservation(location)));
-  }
-
-  void releasLocation(Location location) async {
-    var isSure = await UiHelper.showConfirmationDialog(
-        context, 'هل أنت متأكد من الغاء الحجز');
-
-    if (!isSure) return;
-
-    await ReservationsApiService()
-        .finishReservation(location.currentReservationId);
-    await LocationsApiService().releaseLocation(location.id);
-    await UsersApiService().finishReservation(location.currentReservationId);
-  }
 }
 
 class _LocationCard extends StatelessWidget {
   const _LocationCard({
     required this.location,
-    this.onTraillingTap,
-    this.locationReservation,
     Key? key,
   }) : super(key: key);
 
   final Location location;
-  final Reservation? locationReservation;
-  final onTraillingTap;
   @override
   Widget build(BuildContext context) {
     var stateColor = Colors.red;
@@ -110,15 +86,14 @@ class _LocationCard extends StatelessWidget {
             color: stateColor,
           ),
         ),
-        title: InkWell(
-          child: Text(location.name ?? ''),
-          onTap: showLocationReserveationInfo,
-        ),
+        title: Text(location.name ?? ''),
         subtitle: location.isReserved()
             ? LocationReservationInfo(location: location)
             : null,
         trailing: TextButton(
-          onPressed: onTraillingTap,
+          onPressed: (location.isReserved())
+              ? () => releasLocation(context, location)
+              : () => reserveLocation(context, location),
           child: Text(
             location.isAvailable() ? 'حجز' : 'إنهاء الحجز',
             style: TextStyle(
@@ -131,7 +106,25 @@ class _LocationCard extends StatelessWidget {
     );
   }
 
-  void showLocationReserveationInfo() {}
+  void reserveLocation(BuildContext context, Location location) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => AddReservation(location)));
+  }
+
+  void releasLocation(BuildContext context, Location location) async {
+    var isSure = await UiHelper.showConfirmationDialog(
+        context, 'هل أنت متأكد من الغاء الحجز');
+
+    if (!isSure) return;
+
+    await ReservationsApiService()
+        .finishReservation(location.currentReservationId!);
+    await LocationsApiService().releaseLocation(location.id!);
+
+    var reservation = await ReservationsApiService()
+        .getReservationFuture(location.currentReservationId!);
+    await UsersApiService().finishReservation(reservation.userId!);
+  }
 }
 
 class LocationReservationInfo extends StatelessWidget {
@@ -142,26 +135,25 @@ class LocationReservationInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Reservation>>(
-      stream: ReservationsApiService().getReservationsStream(),
-      builder: (context1, snapshot1) {
-        if (snapshot1.hasData) {
-          var reservation = snapshot1.data!
-              .where((r) => r.id == location.currentReservationId)
-              .single;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                reservation.endDate!.substring(reservation.endDate!.length - 5),
-              ),
-              Text(reservation.userFullName!),
-              Text(reservation.userPhoneNumber!)
-            ],
-          );
+    return StreamBuilder<Reservation>(
+      stream: ReservationsApiService()
+          .getReservationStream(location.currentReservationId!),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
         }
-        return Container();
+        var reservation = snapshot.data!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              reservation.endDate!.substring(reservation.endDate!.length - 5),
+            ),
+            Text(reservation.userFullName!),
+            Text(reservation.userPhoneNumber!)
+          ],
+        );
       },
     );
   }

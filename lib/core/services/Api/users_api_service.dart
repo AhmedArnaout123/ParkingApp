@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
 
 class UsersApiService {
-  final _collection = FirebaseFirestore.instance.collection('users');
+  final _collection = FirebaseFirestore.instance.collection('accounts');
 
   Stream<List<User>> getUsersStream() {
     var streamController = StreamController<List<User>>();
 
-    _collection.snapshots().listen((event) {
+    _collection.where("role", isEqualTo: "user").snapshots().listen((event) {
       List<User> users = [];
 
       for (var user in event.docs) {
@@ -24,6 +24,19 @@ class UsersApiService {
     return streamController.stream;
   }
 
+  Future<List<User>> getUsersFuture() async {
+    List<User> users = [];
+
+    await _collection.where("role", isEqualTo: "user").get().then((value) {
+      for (var doc in value.docs) {
+        var map = <String, dynamic>{...doc.data(), 'id': doc.id};
+        users.add(User.fromMap(map));
+      }
+    });
+
+    return users;
+  }
+
   Stream<User> getUserStream(String userId) {
     var streamController = StreamController<User>();
 
@@ -36,27 +49,14 @@ class UsersApiService {
     return streamController.stream;
   }
 
-  Future<List<User>> getUsers() async {
-    List<User> users = [];
-
-    await _collection.get().then((value) {
-      for (var doc in value.docs) {
-        var map = <String, dynamic>{...doc.data(), 'id': doc.id};
-        users.add(User.fromMap(map));
-      }
-    });
-
-    return users;
-  }
-
-  Future<User> getUser(String? id) async {
+  Future<User> getUserFuture(String id) async {
     var doc = await _collection.doc(id).get();
     return User.fromMap({'id': doc.id, ...doc.data()!});
   }
 
   Future<void> makeReservation(
     String userId,
-    double newBalance,
+    int newBalance,
     String reservationId,
   ) async {
     await _collection.doc(userId).update({
@@ -65,26 +65,18 @@ class UsersApiService {
     });
   }
 
-  Future<void> finishReservation(String? reservationId) async {
-    try {
-      var snapShots = await _collection
-          .where('currentReservationId', isEqualTo: reservationId)
-          .get();
-      var userId = snapShots.docs.single.id;
-      await _collection.doc(userId).update({'currentReservationId': null});
-    } catch (e) {
-      return;
-    }
+  Future<void> finishReservation(String userId) async {
+    await _collection.doc(userId).update({'currentReservationId': null});
   }
 
-  Future<void> addToBalance(String userId, double amount) async {
-    var user = await getUser(userId);
+  Future<void> addToBalance(String userId, int amount) async {
+    var user = await getUserFuture(userId);
     user.balance = user.balance! + amount;
     await _collection.doc(userId).update({'balance': user.balance});
   }
 
-  Future<void> subtractFromBalance(String userId, double amount) async {
-    var user = await getUser(userId);
+  Future<void> subtractFromBalance(String userId, int amount) async {
+    var user = await getUserFuture(userId);
     user.balance = user.balance! - amount;
     await _collection.doc(userId).update({'balance': user.balance});
   }

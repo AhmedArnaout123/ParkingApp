@@ -11,7 +11,7 @@ class Payment {
 
   String? date;
 
-  double? amount;
+  int? amount;
 
   static Payment fromMap(Map<String, dynamic> map) {
     var payment = Payment();
@@ -22,7 +22,7 @@ class Payment {
     payment.userFullName = map['userFullName'];
     payment.workerId = map['workerId'];
     payment.workerFullName = map['workerFullName'];
-    payment.amount = map['amount'] + 0.0;
+    payment.amount = map['amount'];
     return payment;
   }
 

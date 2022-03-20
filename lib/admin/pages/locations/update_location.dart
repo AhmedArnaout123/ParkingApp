@@ -91,14 +91,14 @@ class _UpdateLocationState extends State<UpdateLocation> {
                   return DropdownButtonFormField<Worker>(
                     value: workers![0],
                     hint: const Text("العامل المسؤول"),
-                    onChanged: (admin) {
-                      form['workerId'] = admin!.id;
-                      form['workerFullName'] = admin.name;
+                    onChanged: (worker) {
+                      form['workerId'] = worker!.id;
+                      form['workerFullName'] = worker.fullName;
                       enableUpdateButton();
                     },
                     items: workers
                         .map((worker) => DropdownMenuItem(
-                              child: Text(worker.name!),
+                              child: Text(worker.fullName!),
                               value: worker,
                             ))
                         .toList(),
