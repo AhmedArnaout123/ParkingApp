@@ -3,8 +3,8 @@ import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
 
 class AddReservation extends StatefulWidget {
   const AddReservation(this.location, {Key? key}) : super(key: key);

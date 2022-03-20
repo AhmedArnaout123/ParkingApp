@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:parking_graduation_app_1/core/models/worker.dart';
+import 'package:parking_graduation_app_1/core/models/accounts/worker.dart';
 
 class WorkersApiService {
   final _collection = FirebaseFirestore.instance.collection('workers');
@@ -22,6 +22,21 @@ class WorkersApiService {
     });
 
     return streamController.stream;
+  }
+
+  Future<List<Worker>> getWorkersFuture() async {
+    List<Worker> workers = [];
+
+    await _collection.get().then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        workers.add(Worker.fromMap({
+          'id': doc.id,
+          ...doc.data(),
+        }));
+      }
+    });
+
+    return workers;
   }
 
   Future<Worker> getWorker(String id) async {

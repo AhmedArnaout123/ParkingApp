@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
-import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
-import 'package:parking_graduation_app_1/core/models/worker.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/workers_api_service.dart';
+import 'package:parking_graduation_app_1/core/models/accounts/worker.dart';
+import 'package:parking_graduation_app_1/core/models/location.dart';
+import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/workers_api_service.dart';
 
-class AddNewLocation extends StatefulWidget {
-  const AddNewLocation({Key? key}) : super(key: key);
+class UpdateLocation extends StatefulWidget {
+  const UpdateLocation(this.location, {Key? key}) : super(key: key);
 
+  final Location location;
   @override
-  _AddNewLocationState createState() => _AddNewLocationState();
+  _UpdateLocationState createState() => _UpdateLocationState();
 }
 
-class _AddNewLocationState extends State<AddNewLocation> {
+class _UpdateLocationState extends State<UpdateLocation> {
   bool isLoading = false;
+  bool updateButtonisEnabled = false;
 
-  Map<String, dynamic> form = {
-    'name': '',
-    'lat': 0.0,
-    'long': 0.0,
-    'state': ConstantsHelper.locationStates[0],
-    'workerId': '',
-    'workerFullName': '',
-    'currentReservationId': null
-  };
+  List<Worker> workers = [];
+
+  Map<String, dynamic> form = {};
 
   @override
   void initState() {
     super.initState();
+    form = {
+      'name': widget.location.name,
+      'lat': widget.location.lat,
+      'long': widget.location.long,
+      'state': widget.location.state,
+      'workerId': widget.location.workerId,
+      'workerFullName': widget.location.workerFullName,
+      'currentReservationId': widget.location.currentReservationId
+    };
   }
 
   @override
@@ -38,7 +43,7 @@ class _AddNewLocationState extends State<AddNewLocation> {
         textDirection: TextDirection.rtl,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("موقع جديد"),
+            title: Text('تحديث موقع'),
           ),
           drawer: const AdminDrawer(),
           body: ListView(
@@ -49,7 +54,9 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 decoration: const InputDecoration(hintText: 'اسم الموقع'),
                 onChanged: (value) {
                   form['name'] = value;
+                  enableUpdateButton();
                 },
+                initialValue: form['name'],
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -58,7 +65,9 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 ),
                 onChanged: (value) {
                   form['lat'] = double.parse(value);
+                  enableUpdateButton();
                 },
+                initialValue: form['lat'].toString(),
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -67,36 +76,40 @@ class _AddNewLocationState extends State<AddNewLocation> {
                 ),
                 onChanged: (value) {
                   form['long'] = double.parse(value);
+                  enableUpdateButton();
                 },
+                initialValue: form['long'].toString(),
               ),
               const SizedBox(height: 30),
-              StreamBuilder<List<Worker>>(
-                stream: WorkersApiService().getWorkersStream(),
+              FutureBuilder<List<Worker>>(
+                future: WorkersApiService().getWorkersFuture(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Container();
                   }
                   var workers = snapshot.data;
                   return DropdownButtonFormField<Worker>(
+                    value: workers![0],
                     hint: const Text("العامل المسؤول"),
                     onChanged: (admin) {
                       form['workerId'] = admin!.id;
                       form['workerFullName'] = admin.name;
+                      enableUpdateButton();
                     },
-                    items: [
-                      for (var worker in workers!)
-                        DropdownMenuItem(
-                          child: Text(worker.name!),
-                          value: worker,
-                        )
-                    ],
+                    items: workers
+                        .map((worker) => DropdownMenuItem(
+                              child: Text(worker.name!),
+                              value: worker,
+                            ))
+                        .toList(),
                   );
                 },
               ),
               const SizedBox(height: 60),
-              _AddButton(
-                onPressed: addLocation,
+              _UpdateButton(
+                onPressed: updateLocation,
                 showLoading: isLoading,
+                isEnabled: updateButtonisEnabled,
               )
             ],
           ),
@@ -111,25 +124,37 @@ class _AddNewLocationState extends State<AddNewLocation> {
     });
   }
 
-  void addLocation() async {
-    changeLoadingState();
-    await LocationsApiService().addLocation(form);
+  void enableUpdateButton() {
+    if (!updateButtonisEnabled) {
+      setState(() {
+        updateButtonisEnabled = true;
+      });
+    }
+  }
 
+  void updateLocation() async {
+    changeLoadingState();
+    await LocationsApiService().updateLocation(widget.location.id, form);
     changeLoadingState();
     UiHelper.showDialogWithOkButton(
       context,
-      'تمت الإضافة بنجاح',
+      'تم التعديل بنجاح',
       (_) => Navigator.of(context).pop(),
     );
   }
 }
 
-class _AddButton extends StatelessWidget {
-  const _AddButton({Key? key, this.showLoading = false, this.onPressed})
-      : super(key: key);
+class _UpdateButton extends StatelessWidget {
+  const _UpdateButton({
+    Key? key,
+    this.showLoading = false,
+    this.isEnabled = true,
+    this.onPressed,
+  }) : super(key: key);
 
   final bool showLoading;
-  final VoidCallback? onPressed;
+  final bool isEnabled;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -139,19 +164,18 @@ class _AddButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onPressed: onPressed,
+      onPressed: isEnabled ? onPressed : null,
       child: showLoading
           ? const Center(
               child: SizedBox(
-                height: 25,
-                width: 25,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+              height: 25,
+              width: 25,
+              child: CircularProgressIndicator(
+                color: Colors.white,
               ),
-            )
+            ))
           : const Text(
-              'إضافة',
+              'حفظ',
               style: TextStyle(fontSize: 18),
             ),
     );

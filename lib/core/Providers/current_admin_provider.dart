@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/admin.dart';
+import '../models/accounts/admin.dart';
 
 class CurrentAdminProvider {
   static final CurrentAdminProvider _instance =

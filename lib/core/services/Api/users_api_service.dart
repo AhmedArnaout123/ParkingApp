@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:parking_graduation_app_1/core/models/user.dart';
+import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
 
 class UsersApiService {
   final _collection = FirebaseFirestore.instance.collection('users');

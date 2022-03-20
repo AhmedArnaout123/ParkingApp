@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_location.dart';
-import 'package:parking_graduation_app_1/admin/pages/update_location.dart';
+import 'package:parking_graduation_app_1/admin/pages/locations/add_new_location.dart';
+import 'package:parking_graduation_app_1/admin/pages/locations/update_location.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
 
 class ViewLocations extends StatefulWidget {
   const ViewLocations({Key? key}) : super(key: key);

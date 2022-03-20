@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
-import 'package:parking_graduation_app_1/core/models/user.dart';
-import 'package:parking_graduation_app_1/core/services/payments_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
+import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
+import 'package:parking_graduation_app_1/core/services/Api/payments_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/users_api_service.dart';
 
 class AddPayment extends StatefulWidget {
   const AddPayment({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_new_user.dart';
-import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
+import 'package:parking_graduation_app_1/admin/pages/add_new_accounts/user.dart';
+import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/admin/pages/view_reservations.dart';
 
 class AdminDrawer extends StatelessWidget {

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/users_api_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/add_reservation.dart';
 import 'package:parking_graduation_app_1/worker/widgets/worker_drawer.dart';
 

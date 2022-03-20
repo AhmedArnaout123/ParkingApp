@@ -4,9 +4,9 @@ import 'package:parking_graduation_app_1/core/Helpers/dates_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/models/reservation.dart';
-import 'package:parking_graduation_app_1/core/models/user.dart';
-import 'package:parking_graduation_app_1/core/services/reservations_api_service.dart';
-import 'package:parking_graduation_app_1/core/services/users_api_service.dart';
+import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
+import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/users_api_service.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
+import 'package:parking_graduation_app_1/core/services/Api/accounts_api_service.dart';
 
 class AddNewUser extends StatefulWidget {
   const AddNewUser({Key? key}) : super(key: key);
@@ -14,26 +14,12 @@ class _AddNewUserState extends State<AddNewUser> {
   bool isLoading = false;
 
   Map<String, String?> form = {
-    "name": "",
+    "userName": "",
+    "userFullName": "",
     "password": "",
     "phoneNumber": "",
+    "role": ""
   };
-
-  var usersCollection = FirebaseFirestore.instance.collection('users');
-
-  void changeLoadingState() {
-    setState(() {
-      isLoading = !isLoading;
-    });
-  }
-
-  Future<void> addUser() {
-    changeLoadingState();
-    return usersCollection.add(form).then((value) {
-      UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
-      changeLoadingState();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +83,20 @@ class _AddNewUserState extends State<AddNewUser> {
       ),
     );
   }
+
+  void changeLoadingState() {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
+  void addUser() async {
+    changeLoadingState();
+    await AccountApiService().addAccount(form);
+
+    UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
+    changeLoadingState();
+  }
 }
 
 class _AddButton extends StatelessWidget {
@@ -118,12 +118,13 @@ class _AddButton extends StatelessWidget {
       child: showLoading
           ? const Center(
               child: SizedBox(
-              height: 25,
-              width: 25,
-              child: CircularProgressIndicator(
-                color: Colors.white,
+                height: 25,
+                width: 25,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               ),
-            ))
+            )
           : const Text(
               'إضافة',
               style: TextStyle(fontSize: 18),

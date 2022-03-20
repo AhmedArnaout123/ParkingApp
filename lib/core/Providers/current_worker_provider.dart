@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/worker.dart';
+import '../models/accounts/worker.dart';
 
 class CurrentWorkerProvider {
   static final CurrentWorkerProvider _instance =

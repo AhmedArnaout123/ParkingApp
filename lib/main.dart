@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/view_locations.dart';
+import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/users/pages/home_page.dart';

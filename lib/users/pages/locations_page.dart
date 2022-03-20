@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/geo_cordinates_service.dart';
-import 'package:parking_graduation_app_1/core/services/locations_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
 import 'package:parking_graduation_app_1/users/pages/booking_page.dart';
 
 class LocationsPage extends StatefulWidget {
