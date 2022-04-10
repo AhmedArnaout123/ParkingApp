@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
@@ -125,6 +126,13 @@ class _BookingPageState extends State<BookingPage> {
       (user.balance! - selectedReservation['price']).toInt(),
       resId,
     );
+
+    var locationStream = Geolocator.getPositionStream();
+    locationStream.listen((pos) async {
+      await ReservationsApiService()
+          .ChangeUserPostion(resId, pos.latitude, pos.longitude);
+    });
+
     await LocationsApiService().reserveLocation(widget.location.id!, resId);
     changeLoadingState();
     if (widget.onBookingSuccess != null) {

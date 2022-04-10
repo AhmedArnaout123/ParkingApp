@@ -63,4 +63,11 @@ class ReservationsApiService {
       'cost': newCost,
     });
   }
+
+  Future<void> ChangeUserPostion(
+      String reservationId, double lat, double long) async {
+    await _collection
+        .doc(reservationId)
+        .update({'userLat': lat, 'userLong': long});
+  }
 }
