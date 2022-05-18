@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:parking_graduation_app_1/core/services/notifications_service.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
@@ -134,7 +137,12 @@ class _BookingPageState extends State<BookingPage> {
     });
 
     await LocationsApiService().reserveLocation(widget.location.id!, resId);
+    var notificationTime = tz.TZDateTime.from(
+        endDate.subtract(const Duration(minutes: 15)), tz.local,);
+    NotificationService().schdeule(notificationTime);
+
     changeLoadingState();
+
     if (widget.onBookingSuccess != null) {
       widget.onBookingSuccess();
     }

@@ -8,6 +8,8 @@ import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
 import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/Api/users_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/logout_service.dart';
+import 'package:parking_graduation_app_1/core/services/notifications_service.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -24,9 +26,14 @@ class _ProfilePageState extends State<ProfilePage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () => logout(),
-            icon: const Icon(Icons.logout),
+          leadingWidth: double.infinity,
+          leading: TextButton.icon(
+            onPressed: () => LogoutService().logout(context),
+            label: const Text(
+              "تسجيل الخروج",
+              style: TextStyle(fontSize: 12, color: Colors.white),
+            ),
+            icon: const Icon(Icons.logout_outlined, color: Colors.white),
           ),
         ),
         body: StreamBuilder<User>(
@@ -65,6 +72,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
+                SizedBox(height: 30),
+                TextButton(
+                  onPressed: () {
+                    NotificationService().show();
+                  },
+                  child: Text("Click me"),
+                )
               ],
             );
           },

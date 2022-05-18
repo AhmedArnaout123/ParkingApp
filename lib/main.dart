@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/common/pages/login_page.dart';
+import 'package:parking_graduation_app_1/core/services/notifications_service.dart';
 import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/users/pages/home_page.dart';
 
@@ -44,12 +45,15 @@ class _AppInitializerState extends State<AppInitializer> {
   void initState() {
     super.initState();
     Firebase.initializeApp()
+        .then((value) async => await NotificationService().init())
         .then((_) => {
               setState(() {
                 initializerSucceeded = true;
               })
             })
         .catchError((e) {
+      print("errrroorrr");
+      print(e);
       setState(() {
         initializerFailed = true;
       });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/core/services/logout_service.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_payments.dart';
 
@@ -16,7 +17,7 @@ class WorkerDrawer extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
-              child: Text('Drawer Header'),
+              child: Text(' '),
             ),
             const SizedBox(height: 20),
             ListTile(
@@ -48,6 +49,19 @@ class WorkerDrawer extends StatelessWidget {
                         builder: (context) => const ViewWorkerPayments()),
                   ),
                   icon: const Icon(Icons.place, color: Colors.black),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  label: const Text(
+                    'تسجيل الخروج',
+                    style: TextStyle(fontSize: 18, color: Colors.black),
+                  ),
+                  onPressed: () => LogoutService().logout(context),
+                  icon: const Icon(Icons.logout_outlined, color: Colors.black),
                 ),
               ),
             ),
