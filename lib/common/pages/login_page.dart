@@ -4,6 +4,7 @@ import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.da
 import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
 import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
 import 'package:parking_graduation_app_1/core/services/Api/accounts_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/users/pages/home_page.dart';
 import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
 
@@ -42,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     ],
   );
+
   Widget _buildTextField(String label, String hintText, onChanged,
       [bool hideText = false]) {
     return Column(
@@ -240,14 +242,17 @@ class _LoginPageState extends State<LoginPage> {
     if (isLoginMode) {
       var account =
           await AccountsApiService().login(form['userName'], form['password']);
+      await StorageService().write('userId', account.id);
 
       if (account.role == 'user') {
         await CurrentUserProvider.initialize(account.id!);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const HomePage(),
+            builder: (context) => const UserHomePage(),
           ),
         );
+
+        await StorageService().write('userRole', 'user');
       } else if (account.role == 'worker') {
         await CurrentWorkerProvider.initialize(account.id!);
         Navigator.of(context).pushReplacement(
@@ -255,25 +260,25 @@ class _LoginPageState extends State<LoginPage> {
             builder: (context) => const ViewWorkerLocations(),
           ),
         );
+
+        await StorageService().write('userRole', 'worker');
       } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const ViewLocations(),
+            builder: (context) => const ViewAdminLocations(),
           ),
         );
+
+        await StorageService().write('userRole', 'admin');
       }
     } else {
-      var id = await AccountsApiService().registerUser(
-        form['fullName'],
-        form['userName'],
-        form['phoneNumber'],
-        form['password'],
-      );
+      var id = await AccountsApiService().registerUser(form['fullName'],
+          form['userName'], form['phoneNumber'], form['password']);
 
       await CurrentUserProvider.initialize(id);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) => const UserHomePage(),
         ),
       );
     }

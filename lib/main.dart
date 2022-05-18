@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:parking_graduation_app_1/admin/pages/add_worker_or_admin.dart';
 import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/common/pages/login_page.dart';
-import 'package:parking_graduation_app_1/core/Providers/current_user_provider.dart';
-import 'package:parking_graduation_app_1/core/Providers/current_worker_provider.dart';
+import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 import 'package:parking_graduation_app_1/users/pages/home_page.dart';
-import 'package:parking_graduation_app_1/worker/pages/view_worker_locations.dart';
+
+import 'core/Providers/current_user_provider.dart';
+import 'core/Providers/current_worker_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,86 +44,22 @@ class _AppInitializerState extends State<AppInitializer> {
   void initState() {
     super.initState();
     Firebase.initializeApp()
-        .then((_) async {
-          // CurrentUserProvider.initialize('qTD15op2mHFMMA3SnlRE');
-          // CurrentWorkerProvider.initialize('UK706Ke3hqcS7vaIt7A0');
-        })
         .then((_) => {
               setState(() {
                 initializerSucceeded = true;
               })
             })
         .catchError((e) {
-          setState(() {
-            initializerFailed = false;
-          });
-        });
+      setState(() {
+        initializerFailed = true;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     if (initializerSucceeded) {
-      return Scaffold(
-        body: ListView(
-          children: [
-            ElevatedButton(
-              child: const Text('ADMINS'),
-              onPressed: () async {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const AddWorkerOrAdmin()));
-              },
-            ),
-            ElevatedButton(
-              child: const Text('login'),
-              onPressed: () async {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const LoginPage()));
-              },
-            ),
-            ElevatedButton(
-              child: const Text('WORKERS'),
-              onPressed: () async {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ViewWorkerLocations(),
-                  ),
-                );
-              },
-            ),
-            ElevatedButton(
-              child: const Text('USERS'),
-              onPressed: () async {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => const HomePage()));
-              },
-            ),
-            // ElevatedButton(
-            //   child: const Text('Add Dummy Users'),
-            //   onPressed: () async {
-            //     var user1 = User()
-            //       ..balance = 100.0
-            //       ..name = 'محمد محمود'
-            //       ..phoneNumber = '0965434340'
-            //       ..userName = 'xxx';
-
-            //     var worker1 = Worker()
-            //       ..name = 'islam'
-            //       ..phoneNumber = '0322343'
-            //       ..salary = 10
-            //       ..userName = 'islamx';
-
-            //     await FirebaseFirestore.instance
-            //         .collection('users')
-            //         .add(user1.toMap());
-
-            //     await FirebaseFirestore.instance
-            //         .collection('workers')
-            //         .add(worker1.toMap());
-            //   },
-            // ),
-          ],
-        ),
-      );
+      return const _MainNavigator();
     }
     if (initializerFailed) {
       return const _InitializtionError();
@@ -146,6 +82,50 @@ class _InitializtionError extends StatelessWidget {
           style: TextStyle(color: Colors.red, fontSize: 14),
         ),
       ),
+    );
+  }
+}
+
+class _MainNavigator extends StatefulWidget {
+  const _MainNavigator({Key? key}) : super(key: key);
+
+  @override
+  State<_MainNavigator> createState() => __MainNavigatorState();
+}
+
+class __MainNavigatorState extends State<_MainNavigator> {
+  Future<Widget> navigate() async {
+    var id = await StorageService().read('userId');
+    var role = await StorageService().read('userRole');
+
+    if (id == null || role == null) {
+      return const LoginPage();
+    }
+
+    if (role == 'user') {
+      await CurrentUserProvider.initialize(id);
+      return const UserHomePage();
+    } else if (role == 'worker') {
+      await CurrentWorkerProvider.initialize(id);
+      return const ViewAdminLocations();
+    } else {
+      return const ViewAdminLocations();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Widget>(
+      future: navigate(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return snapshot.data!;
+        }
+
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 }

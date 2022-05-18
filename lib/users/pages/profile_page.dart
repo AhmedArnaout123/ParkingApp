@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/common/pages/login_page.dart';
 import 'package:parking_graduation_app_1/core/Helpers/constants_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/dates_helper.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
@@ -7,10 +8,16 @@ import 'package:parking_graduation_app_1/core/models/reservation.dart';
 import 'package:parking_graduation_app_1/core/models/accounts/user.dart';
 import 'package:parking_graduation_app_1/core/services/Api/reservations_api_service.dart';
 import 'package:parking_graduation_app_1/core/services/Api/users_api_service.dart';
+import 'package:parking_graduation_app_1/core/services/storage_service.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -18,12 +25,7 @@ class ProfilePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () {
-              UiHelper.showConfirmationDialog(
-                context,
-                'هل أنت متأكد من تسجيل الخروج',
-              );
-            },
+            onPressed: () => logout(),
             icon: const Icon(Icons.logout),
           ),
         ),
@@ -70,6 +72,20 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> logout() async {
+    var isSure = await UiHelper.showConfirmationDialog(
+      context,
+      'هل أنت متأكد من تسجيل الخروج',
+    );
+    if (!isSure) return;
+
+    await StorageService().remove('userId');
+    await StorageService().remove('userRole');
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
 }
 
 class CurrentBalanceCard extends StatelessWidget {
@@ -82,7 +98,8 @@ class CurrentBalanceCard extends StatelessWidget {
 }
 
 class CurrentReservationWidget extends StatelessWidget {
-  CurrentReservationWidget(this.reservationId, {Key? key}) : super(key: key);
+  const CurrentReservationWidget(this.reservationId, {Key? key})
+      : super(key: key);
 
   final String reservationId;
   String getHoursFromDate(String date) {

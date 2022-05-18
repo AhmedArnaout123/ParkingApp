@@ -24,7 +24,6 @@ class CurrentUserProvider {
         await FirebaseFirestore.instance.collection('accounts').doc(id).get();
 
     _user = User.fromMap({'id': doc.id, ...doc.data()!});
-    print('user is $_user');
     _subscription = FirebaseFirestore.instance
         .collection('accounts')
         .doc(id)

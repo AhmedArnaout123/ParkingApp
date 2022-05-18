@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:parking_graduation_app_1/users/pages/locations_page.dart';
 import 'package:parking_graduation_app_1/users/pages/profile_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class UserHomePage extends StatefulWidget {
+  const UserHomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _UserHomePageState createState() => _UserHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UserHomePageState extends State<UserHomePage> {
   int pageIndex = 0;
   PageController pageController = PageController();
 

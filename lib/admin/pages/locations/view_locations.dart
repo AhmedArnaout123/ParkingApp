@@ -7,14 +7,14 @@ import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/models/location.dart';
 import 'package:parking_graduation_app_1/core/services/Api/locations_api_service.dart';
 
-class ViewLocations extends StatefulWidget {
-  const ViewLocations({Key? key}) : super(key: key);
+class ViewAdminLocations extends StatefulWidget {
+  const ViewAdminLocations({Key? key}) : super(key: key);
 
   @override
-  _ViewLocationsState createState() => _ViewLocationsState();
+  _ViewAdminLocationsState createState() => _ViewAdminLocationsState();
 }
 
-class _ViewLocationsState extends State<ViewLocations> {
+class _ViewAdminLocationsState extends State<ViewAdminLocations> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -89,12 +89,17 @@ class _UpdateLocationState extends State<UpdateLocation> {
                   }
                   var workers = snapshot.data;
                   return DropdownButtonFormField<Worker>(
-                    value: workers![0],
+                    value: workers!.firstWhere(
+                      (worker) =>
+                          worker.id ==
+                          (form['workerId'] ?? widget.location.workerId),
+                    ),
                     hint: const Text("العامل المسؤول"),
                     onChanged: (worker) {
                       form['workerId'] = worker!.id;
                       form['workerFullName'] = worker.fullName;
                       enableUpdateButton();
+                      setState(() {});
                     },
                     items: workers
                         .map((worker) => DropdownMenuItem(

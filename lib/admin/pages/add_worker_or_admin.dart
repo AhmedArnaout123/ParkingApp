@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parking_graduation_app_1/admin/pages/locations/view_locations.dart';
 import 'package:parking_graduation_app_1/admin/widgets/admin_drawer.dart';
 import 'package:parking_graduation_app_1/core/Helpers/ui_helper.dart';
 import 'package:parking_graduation_app_1/core/services/Api/accounts_api_service.dart';
@@ -66,7 +67,7 @@ class _AddWorkerOrAdminState extends State<AddWorkerOrAdmin> {
               ),
               const SizedBox(height: 30),
               DropdownButtonFormField<String>(
-                hint: const Text("النوع"),
+                hint: const Text("الوظيفة"),
                 onChanged: (value) {
                   form['role'] = value;
                 },
@@ -100,8 +101,11 @@ class _AddWorkerOrAdminState extends State<AddWorkerOrAdmin> {
     changeLoadingState();
     await AccountsApiService().addAccount(form);
 
-    UiHelper.showDialogWithOkButton(context, 'تمت الإضافة بنجاح');
-    changeLoadingState();
+    UiHelper.showDialogWithOkButton(
+        context,
+        'تمت الإضافة بنجاح',
+        (_) => Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ViewAdminLocations())));
   }
 }
 
@@ -110,7 +114,7 @@ class _AddButton extends StatelessWidget {
       : super(key: key);
 
   final bool showLoading;
-  final VoidCallback? onPressed;
+  final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
